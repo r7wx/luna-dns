@@ -41,7 +41,7 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.Info("configuration file loaded: " + args[0])
+	logger.Info("Configuration file loaded: " + args[0])
 
 	engine.NewEngine(config)
 }

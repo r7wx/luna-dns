@@ -41,7 +41,7 @@ func Info(message any) {
 // Error - Print an error log message
 func Error(message any) {
 	timestamp := time.Now().Format(time.RFC822)
-	fmt.Printf("%v%v %s\n",
+	fmt.Printf("%v%v Error: %s\n",
 		color.RedString("["+timestamp+"]"),
 		color.RedString("[luna-dns]"),
 		message,

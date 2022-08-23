@@ -34,13 +34,13 @@ type Engine struct {
 
 // NewEngine - Create a new engine
 func NewEngine(config *config.Config) (*Engine, error) {
-	logger.Info("initializing engine")
+	logger.Info("Initializing engine...")
 	overrides, err := newOverrides(config)
 	if err != nil {
 		return nil, err
 	}
 
-	logger.Info("engine ready")
+	logger.Info("Engine ready")
 	return &Engine{
 		overrides: overrides,
 		addr:      config.Addr,
