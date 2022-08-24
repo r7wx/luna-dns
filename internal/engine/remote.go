@@ -39,10 +39,10 @@ func (e *Engine) remoteFallback(message *dns.Msg) {
 	}
 
 	for _, server := range e.dns {
-		conn, err := dns.Dial(server.Protocol, server.Addr)
+		conn, err := dns.Dial(server.Network, server.Addr)
 		if err != nil {
 			logger.Debug(fmt.Sprintf("%s (%s): %s",
-				server.Addr, server.Protocol, err))
+				server.Addr, server.Network, err))
 			continue
 		}
 		defer conn.Close()
@@ -51,19 +51,19 @@ func (e *Engine) remoteFallback(message *dns.Msg) {
 		err = conn.WriteMsg(request)
 		if err != nil {
 			logger.Debug(fmt.Sprintf("%s (%s): %s",
-				server.Addr, server.Protocol, err))
+				server.Addr, server.Network, err))
 			continue
 		}
 
 		response, err := conn.ReadMsg()
 		if err != nil {
 			logger.Debug(fmt.Sprintf("%s (%s): %s",
-				server.Addr, server.Protocol, err))
+				server.Addr, server.Network, err))
 			continue
 		}
 		if response == nil || response.Rcode != dns.RcodeSuccess {
 			logger.Debug(fmt.Sprintf("%s (%s): %s",
-				server.Addr, server.Protocol,
+				server.Addr, server.Network,
 				"failed to get a valid response"))
 			continue
 		}
@@ -71,7 +71,7 @@ func (e *Engine) remoteFallback(message *dns.Msg) {
 		if len(response.Answer) > 0 {
 			message.Answer = response.Answer
 			logger.Debug(fmt.Sprintf("%s (%s) -> %s", server.Addr,
-				server.Protocol, response.Answer))
+				server.Network, response.Answer))
 			go e.cache.Insert(message.Question, response.Answer)
 			return
 		}

@@ -27,26 +27,26 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Override - Override configuration struct
-type Override struct {
+// Host - Host configuration struct
+type Host struct {
 	Domain string `yaml:"domain"`
 	IP     string `yaml:"ip"`
 }
 
 // DNS - DNS server configuration struct
 type DNS struct {
-	Addr     string `yaml:"addr"`
-	Protocol string `yaml:"protocol"`
+	Addr    string `yaml:"addr"`
+	Network string `yaml:"network"`
 }
 
 // Config - Main configuration struct
 type Config struct {
-	Addr      string     `yaml:"addr"`
-	Protocol  string     `yaml:"protocol"`
-	DNS       []DNS      `yaml:"dns"`
-	Overrides []Override `yaml:"overrides"`
-	Debug     bool       `yaml:"debug"`
-	CacheTTL  int64      `yaml:"cache_ttl"`
+	Addr     string `yaml:"addr"`
+	Network  string `yaml:"network"`
+	DNS      []DNS  `yaml:"dns"`
+	Hosts    []Host `yaml:"hosts"`
+	Debug    bool   `yaml:"debug"`
+	CacheTTL int64  `yaml:"cache_ttl"`
 }
 
 // Load - Load configuration from file

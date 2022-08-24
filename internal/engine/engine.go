@@ -33,34 +33,34 @@ import (
 
 // Engine - DNS Engine
 type Engine struct {
-	overrides *tree.Tree
-	cache     *cache.Cache
-	addr      string
-	protocol  string
-	dns       []config.DNS
+	Hosts   *tree.Tree
+	cache   *cache.Cache
+	addr    string
+	Network string
+	dns     []config.DNS
 }
 
 // NewEngine - Create a new engine
 func NewEngine(config *config.Config) (*Engine, error) {
 	logger.Info("Initializing engine...")
 
-	overrides := tree.NewTree()
-	for _, override := range config.Overrides {
-		entry, err := entry.NewEntry(override.Domain, override.IP)
+	Hosts := tree.NewTree()
+	for _, host := range config.Hosts {
+		entry, err := entry.NewEntry(host.Domain, host.IP)
 		if err != nil {
 			return nil, err
 		}
-		overrides.Insert(entry)
+		Hosts.Insert(entry)
 	}
 
 	logger.Info("Engine ready")
 	return &Engine{
-		overrides: overrides,
+		Hosts: Hosts,
 		cache: cache.NewCache(time.Duration(config.CacheTTL) *
 			time.Second),
-		addr:     config.Addr,
-		protocol: config.Protocol,
-		dns:      config.DNS,
+		addr:    config.Addr,
+		Network: config.Network,
+		dns:     config.DNS,
 	}, nil
 }
 
@@ -69,10 +69,10 @@ func (e *Engine) Start() error {
 	go e.cache.Routine()
 
 	logger.Info("Engine listening on: " + e.addr + " (" +
-		e.protocol + ")")
+		e.Network + ")")
 
 	dns.HandleFunc(".", e.handler)
-	server := &dns.Server{Addr: e.addr, Net: e.protocol}
+	server := &dns.Server{Addr: e.addr, Net: e.Network}
 	err := server.ListenAndServe()
 	if err != nil {
 		return err

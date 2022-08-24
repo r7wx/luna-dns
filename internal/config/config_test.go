@@ -43,12 +43,12 @@ func TestConfig(t *testing.T) {
 	}
 
 	filePath := writeFile(t, []byte(`addr: 0.0.0.0:5353
-protocol: tcp
+network: tcp
 debug: true
 dns:
   - addr: "8.8.8.8:53"
-    protocol: "udp"
-overrides:
+    network: "udp"
+hosts:
   - domain: google.com
     ip: 127.0.0.1
   - domain: "*.test.com"
@@ -63,18 +63,18 @@ overrides:
 	if config.Addr != "0.0.0.0:5353" {
 		t.Fatal()
 	}
-	if config.Protocol != "tcp" {
+	if config.Network != "tcp" {
 		t.Fatal()
 	}
 	if !reflect.DeepEqual(config.DNS, []DNS{
 		{
-			Addr:     "8.8.8.8:53",
-			Protocol: "udp",
+			Addr:    "8.8.8.8:53",
+			Network: "udp",
 		},
 	}) {
 		t.Fatal()
 	}
-	if !reflect.DeepEqual(config.Overrides, []Override{
+	if !reflect.DeepEqual(config.Hosts, []Host{
 		{
 			Domain: "google.com",
 			IP:     "127.0.0.1",

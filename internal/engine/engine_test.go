@@ -28,7 +28,7 @@ import (
 
 func TestNewEngine(t *testing.T) {
 	_, err := NewEngine(&config.Config{
-		Overrides: []config.Override{
+		Hosts: []config.Host{
 			{
 				Domain: "google.com",
 				IP:     "127.0.0.1",
@@ -40,7 +40,7 @@ func TestNewEngine(t *testing.T) {
 	}
 
 	_, err = NewEngine(&config.Config{
-		Overrides: []config.Override{
+		Hosts: []config.Host{
 			{
 				Domain: "x",
 			},

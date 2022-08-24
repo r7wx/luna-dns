@@ -1,13 +1,13 @@
 addr: "0.0.0.0:5355"
-protocol: "udp"
+network: "udp"
 cache_ttl: 14400
 debug: true
 dns:
   - addr: "8.8.8.8:53"
-    protocol: "tcp"
+    network: "tcp"
   - addr: "8.8.4.4:53"
-    protocol: "udp"
-overrides:
+    network: "udp"
+hosts:
   - domain: google.com
     ip: 127.0.1.1
   - domain: "test.com"
