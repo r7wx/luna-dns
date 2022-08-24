@@ -18,14 +18,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package dtree
+package tree
 
 import (
 	"github.com/r7wx/luna-dns/internal/entry"
 )
 
-// Search - Search for an entry in domain tree
-func (t *DTree) Search(entry *entry.Entry) string {
+// Search - Search for a domain in DNS tree
+func (t *Tree) Search(domain string) (string, error) {
+	entry, err := entry.NewEntry(domain, "")
+	if err != nil {
+		return "", err
+	}
+
+	return t.searchEntry(entry), nil
+}
+
+func (t *Tree) searchEntry(entry *entry.Entry) string {
 	foundTLD, wildcard := searchNode(&t.tlds, entry.TLD)
 	if wildcard {
 		return foundTLD.ip

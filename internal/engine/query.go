@@ -30,8 +30,8 @@ func (e *Engine) query(message *dns.Msg) {
 	for _, q := range message.Question {
 		switch q.Qtype {
 		case dns.TypeA:
-			ip := e.overrides.SearchDomain(q.Name[:len(q.Name)-1])
-			if ip == "" {
+			ip, err := e.overrides.Search(q.Name[:len(q.Name)-1])
+			if ip == "" || err != nil {
 				e.remoteFallback(message)
 				return
 			}

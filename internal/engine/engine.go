@@ -44,18 +44,18 @@ type Engine struct {
 func NewEngine(config *config.Config) (*Engine, error) {
 	logger.Info("Initializing engine...")
 
-	overrides := []entry.Entry{}
+	overrides := tree.NewTree()
 	for _, override := range config.Overrides {
 		entry, err := entry.NewEntry(override.Domain, override.IP)
 		if err != nil {
 			return nil, err
 		}
-		overrides = append(overrides, *entry)
+		overrides.Insert(entry)
 	}
 
 	logger.Info("Engine ready")
 	return &Engine{
-		overrides: tree.NewTree(overrides),
+		overrides: overrides,
 		cache: cache.NewCache(time.Duration(config.CacheTTL) *
 			time.Second),
 		addr:     config.Addr,

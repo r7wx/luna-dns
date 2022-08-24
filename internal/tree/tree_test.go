@@ -26,25 +26,110 @@ import (
 	"github.com/r7wx/luna-dns/internal/entry"
 )
 
-func TestTree(t *testing.T) {
-	testEntry, _ := entry.NewEntry("google.com", "127.0.0.1")
-	tree := NewTree([]entry.Entry{*testEntry})
+func TestBasics(t *testing.T) {
+	testEntries := func(tree *Tree, entries []map[string]string, t *testing.T) {
+		for _, e := range entries {
+			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			tree.Insert(testEntry)
 
-	testEntry, _ = entry.NewEntry("*.google.com", "8.8.8.8")
-	tree.Insert(testEntry)
+			found, _ := tree.Search(testEntry.Domain)
+			if found == "" {
+				t.Fatal()
+				continue
+			}
 
-	found := tree.SearchDomain("google.com")
-	if found != "127.0.0.1" {
-		t.Fatal()
+			if found != testEntry.IP {
+				t.Fatal()
+			}
+		}
 	}
 
-	found = tree.SearchDomain("test.google.com")
-	if found != "8.8.8.8" {
-		t.Fatal()
+	tree := NewTree()
+	testEntries(tree, []map[string]string{
+		{
+			"domain": "test.com",
+			"ip":     "127.0.0.1",
+		},
+		{
+			"domain": "a.test.com",
+			"ip":     "127.0.0.1",
+		},
+		{
+			"domain": "test.a",
+			"ip":     "127.0.0.1",
+		},
+	}, t)
+}
+
+func TestOthers(t *testing.T) {
+	insertEntries := func(tree *Tree, entries []map[string]string) {
+		for _, e := range entries {
+			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			tree.Insert(testEntry)
+		}
 	}
 
-	found = tree.SearchDomain("xxxx")
-	if found != "" {
+	searchDomains := func(tree *Tree, entries []map[string]any,
+		t *testing.T) {
+		for _, e := range entries {
+			domain := e["domain"].(string)
+			expected := e["expected"].(bool)
+
+			found, _ := tree.Search(domain)
+			if found == "" && expected {
+				t.Fatal()
+			}
+			if found != "" && !expected {
+				t.Fatal()
+			}
+		}
+	}
+
+	tree := NewTree()
+	insertEntries(tree, []map[string]string{
+		{
+			"domain": "*.test.com",
+			"ip":     "127.0.0.1",
+		},
+		{
+			"domain": "*.tld",
+			"ip":     "127.0.0.1",
+		},
+	})
+	searchDomains(tree, []map[string]any{
+		{
+			"domain":   "unk.com",
+			"expected": false,
+		},
+		{
+			"domain":   "aaa.test.com",
+			"expected": true,
+		},
+		{
+			"domain":   "test.tld",
+			"expected": true,
+		},
+		{
+			"domain":   "test.xxx",
+			"expected": false,
+		},
+	}, t)
+
+	insertEntries(tree, []map[string]string{
+		{
+			"domain": "*",
+			"ip":     "127.0.0.1",
+		},
+	})
+	searchDomains(tree, []map[string]any{
+		{
+			"domain":   "google.com",
+			"expected": true,
+		},
+	}, t)
+
+	_, err := tree.Search("xxx")
+	if err == nil {
 		t.Fatal()
 	}
 }

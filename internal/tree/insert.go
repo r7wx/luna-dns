@@ -18,14 +18,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package dtree
+package tree
 
 import (
 	"github.com/r7wx/luna-dns/internal/entry"
 )
 
-// Insert - Insert new entry in domain tree
-func (t *DTree) Insert(entry *entry.Entry) {
+// Insert - Insert new entry in DNS tree
+func (t *Tree) Insert(entry *entry.Entry) {
 	foundTLD, _ := searchNode(&t.tlds, entry.TLD)
 	if foundTLD == nil {
 		foundTLD = t.insertNode(&t.tlds, entry.TLD, entry.IP)
@@ -42,7 +42,7 @@ func (t *DTree) Insert(entry *entry.Entry) {
 	}
 }
 
-func (t *DTree) insertNode(nodes *map[string]*node, domain string, ip string) *node {
+func (t *Tree) insertNode(nodes *map[string]*node, domain string, ip string) *node {
 	if domain == "*" {
 		for k := range *nodes {
 			delete(*nodes, k)
