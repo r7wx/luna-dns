@@ -18,20 +18,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package share
+package entry
 
-import "github.com/fatih/color"
+import (
+	"fmt"
+	"strings"
+)
 
-// PrintLogo - Print luna-dns logo
-func PrintLogo() {
-	logo := `
- ██▓     █    ██  ███▄    █  ▄▄▄      ▓█████▄  ███▄    █   ██████ 
-▓██▒     ██  ▓██▒ ██ ▀█   █ ▒████▄    ▒██▀ ██▌ ██ ▀█   █ ▒██    ▒ 
-▒██░    ▓██  ▒██░▓██  ▀█ ██▒▒██  ▀█▄  ░██   █▌▓██  ▀█ ██▒░ ▓██▄   
-▒██░    ▓▓█  ░██░▓██▒  ▐▌██▒░██▄▄▄▄██ ░▓█▄   ▌▓██▒  ▐▌██▒  ▒   ██▒
-░██████▒▒▒█████▓ ▒██░   ▓██░ ▓█   ▓██▒░▒████▓ ▒██░   ▓██░▒██████▒▒
-░ ▒░▓  ░░▒▓▒ ▒ ▒ ░ ▒░   ▒ ▒  ▒▒   ▓▒█░ ▒▒▓  ▒ ░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░
+// Entry - Entry struct
+type Entry struct {
+	Domain     string
+	IP         string
+	TLD        string
+	Subdomains []string
+}
 
-`
-	color.Magenta(logo)
+// NewEntry - Create a new entry
+func NewEntry(domain, ip string) (*Entry, error) {
+	elements := strings.Split(domain, ".")
+	if len(elements) == 1 && elements[0] != "*" {
+		return nil,
+			fmt.Errorf("invalid domain: %s", domain)
+	}
+
+	subdomains := []string{}
+	for i := len(elements) - 2; i >= 0; i-- {
+		subdomains = append(subdomains, elements[i])
+	}
+
+	return &Entry{
+		Domain:     domain,
+		IP:         ip,
+		TLD:        elements[len(elements)-1],
+		Subdomains: subdomains,
+	}, nil
 }

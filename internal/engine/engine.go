@@ -23,27 +23,28 @@ package engine
 import (
 	"github.com/r7wx/luna-dns/internal/config"
 	"github.com/r7wx/luna-dns/internal/logger"
+	"github.com/r7wx/luna-dns/internal/override"
 )
 
 // Engine - DNS Engine
 type Engine struct {
-	overrides *overrides
-	addr      string
-	dns       []string
+	override *override.Override
+	addr     string
+	dns      []string
 }
 
 // NewEngine - Create a new engine
 func NewEngine(config *config.Config) (*Engine, error) {
 	logger.Info("Initializing engine...")
-	overrides, err := newOverrides(config)
+	override, err := override.NewOverride(config)
 	if err != nil {
 		return nil, err
 	}
 
 	logger.Info("Engine ready")
 	return &Engine{
-		overrides: overrides,
-		addr:      config.Addr,
-		dns:       config.DNS,
+		override: override,
+		addr:     config.Addr,
+		dns:      config.DNS,
 	}, nil
 }

@@ -18,17 +18,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package dtree
 
-// Error - Engine error
-type Error struct {
-	message string
+import (
+	"github.com/r7wx/luna-dns/internal/entry"
+)
+
+// Search - Search for an entry in domain tree
+func (t *DTree) Search(entry *entry.Entry) string {
+	foundTLD, wildcard := searchNode(&t.tlds, entry.TLD)
+	if wildcard {
+		return foundTLD.ip
+	}
+
+	if foundTLD != nil {
+		current := foundTLD
+		for index, subdomain := range entry.Subdomains {
+			foundNode, wildcard := searchNode(&current.childrens, subdomain)
+			switch {
+			case wildcard:
+				return foundNode.ip
+			case foundNode == nil:
+				return ""
+			case index == len(entry.Subdomains)-1:
+				return foundNode.ip
+			}
+			current = foundNode
+		}
+	}
+
+	return ""
 }
 
-func newError(message string) *Error {
-	return &Error{message}
-}
+func searchNode(nodes *map[string]*node, key string) (*node, bool) {
+	wildcardNode, ok := (*nodes)["*"]
+	if ok {
+		return wildcardNode, true
+	}
 
-func (e *Error) Error() string {
-	return e.message
+	node, ok := (*nodes)[key]
+	if !ok {
+		return nil, false
+	}
+
+	return node, false
 }

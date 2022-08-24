@@ -18,22 +18,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package dtree
 
 import (
 	"testing"
+
+	"github.com/r7wx/luna-dns/internal/entry"
 )
 
 func TestBasics(t *testing.T) {
-	testEntries := func(tree *domainTree, entries []map[string]string, t *testing.T) {
-		for _, entry := range entries {
-			testEntry, _ := newEntry(entry["domain"], entry["ip"])
-			tree.insert(testEntry)
+	testEntries := func(tree *DTree, entries []map[string]string, t *testing.T) {
+		for _, e := range entries {
+			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			tree.Insert(testEntry)
 
-			targetIP := testEntry.ip
-			testEntry.ip = ""
+			targetIP := testEntry.IP
+			testEntry.IP = ""
 
-			found := tree.search(testEntry)
+			found := tree.Search(testEntry)
 			if found == "" {
 				t.Fatal()
 				continue
@@ -45,7 +47,7 @@ func TestBasics(t *testing.T) {
 		}
 	}
 
-	tree := &domainTree{}
+	tree := NewDTree()
 	testEntries(tree, []map[string]string{
 		{
 			"domain": "test.com",
@@ -63,21 +65,21 @@ func TestBasics(t *testing.T) {
 }
 
 func TestOthers(t *testing.T) {
-	insertEntries := func(tree *domainTree, entries []map[string]string) {
-		for _, entry := range entries {
-			testEntry, _ := newEntry(entry["domain"], entry["ip"])
-			tree.insert(testEntry)
+	insertEntries := func(tree *DTree, entries []map[string]string) {
+		for _, e := range entries {
+			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			tree.Insert(testEntry)
 		}
 	}
 
-	searchDomains := func(tree *domainTree, entries []map[string]any,
+	searchDomains := func(tree *DTree, entries []map[string]any,
 		t *testing.T) {
-		for _, entry := range entries {
-			domain := entry["domain"].(string)
-			expected := entry["expected"].(bool)
+		for _, e := range entries {
+			domain := e["domain"].(string)
+			expected := e["expected"].(bool)
 
-			testEntry, _ := newEntry(domain, "")
-			found := tree.search(testEntry)
+			testEntry, _ := entry.NewEntry(domain, "")
+			found := tree.Search(testEntry)
 
 			if found == "" && expected {
 				t.Fatal()
@@ -88,7 +90,7 @@ func TestOthers(t *testing.T) {
 		}
 	}
 
-	tree := &domainTree{}
+	tree := NewDTree()
 	insertEntries(tree, []map[string]string{
 		{
 			"domain": "*.test.com",

@@ -18,30 +18,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package main
+package logo
 
-import (
-	"os"
+import "github.com/fatih/color"
 
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/engine"
-	"github.com/r7wx/luna-dns/internal/logger"
-	"github.com/r7wx/luna-dns/internal/logo"
-)
+// Print - Print luna-dns logo
+func Print() {
+	logo := `
+ ██▓     █    ██  ███▄    █  ▄▄▄      ▓█████▄  ███▄    █   ██████ 
+▓██▒     ██  ▓██▒ ██ ▀█   █ ▒████▄    ▒██▀ ██▌ ██ ▀█   █ ▒██    ▒ 
+▒██░    ▓██  ▒██░▓██  ▀█ ██▒▒██  ▀█▄  ░██   █▌▓██  ▀█ ██▒░ ▓██▄   
+▒██░    ▓▓█  ░██░▓██▒  ▐▌██▒░██▄▄▄▄██ ░▓█▄   ▌▓██▒  ▐▌██▒  ▒   ██▒
+░██████▒▒▒█████▓ ▒██░   ▓██░ ▓█   ▓██▒░▒████▓ ▒██░   ▓██░▒██████▒▒
+░ ▒░▓  ░░▒▓▒ ▒ ▒ ░ ▒░   ▒ ▒  ▒▒   ▓▒█░ ▒▒▓  ▒ ░ ▒░   ▒ ▒ ▒ ▒▓▒ ▒ ░
 
-func main() {
-	logo.Print()
-
-	args := os.Args[1:]
-	if len(args) <= 0 {
-		logger.Fatal("no configuration file provided")
-	}
-
-	config, err := config.Load(args[0])
-	if err != nil {
-		logger.Fatal(err)
-	}
-	logger.Info("Configuration file loaded: " + args[0])
-
-	engine.NewEngine(config)
+`
+	color.Magenta(logo)
 }

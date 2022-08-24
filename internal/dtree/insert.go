@@ -18,13 +18,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package dtree
 
-import "testing"
+import (
+	"github.com/r7wx/luna-dns/internal/entry"
+)
 
-func TestErrors(t *testing.T) {
-	err := newError("test")
-	if err.Error() != "test" {
-		t.Fatal()
+// Insert - Insert new entry in domain tree
+func (t *DTree) Insert(entry *entry.Entry) {
+	foundTLD, _ := searchNode(&t.tlds, entry.TLD)
+	if foundTLD == nil {
+		foundTLD = t.insertNode(&t.tlds, entry.TLD, entry.IP)
 	}
+
+	current := foundTLD
+	for _, subdomain := range entry.Subdomains {
+		foundNode, _ := searchNode(&current.childrens, subdomain)
+		if foundNode == nil {
+			foundNode = t.insertNode(&current.childrens, subdomain,
+				entry.IP)
+		}
+		current = foundNode
+	}
+}
+
+func (t *DTree) insertNode(nodes *map[string]*node, domain string, ip string) *node {
+	if domain == "*" {
+		for k := range *nodes {
+			delete(*nodes, k)
+		}
+		(*nodes)["*"] = &node{
+			ip:        ip,
+			childrens: map[string]*node{},
+		}
+
+		insertedNode, _ := searchNode(nodes, domain)
+		return insertedNode
+	}
+
+	(*nodes)[domain] = &node{
+		ip:        ip,
+		childrens: map[string]*node{},
+	}
+
+	insertedNode, _ := searchNode(nodes, domain)
+	return insertedNode
 }

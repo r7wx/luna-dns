@@ -18,30 +18,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package main
+package dtree
 
-import (
-	"os"
+type node struct {
+	childrens map[string]*node
+	ip        string
+}
 
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/engine"
-	"github.com/r7wx/luna-dns/internal/logger"
-	"github.com/r7wx/luna-dns/internal/logo"
-)
+// DTree - Domain tree struct
+type DTree struct {
+	tlds map[string]*node
+}
 
-func main() {
-	logo.Print()
-
-	args := os.Args[1:]
-	if len(args) <= 0 {
-		logger.Fatal("no configuration file provided")
+// NewDTree - Create a new domain tree
+func NewDTree() *DTree {
+	return &DTree{
+		tlds: map[string]*node{},
 	}
-
-	config, err := config.Load(args[0])
-	if err != nil {
-		logger.Fatal(err)
-	}
-	logger.Info("Configuration file loaded: " + args[0])
-
-	engine.NewEngine(config)
 }

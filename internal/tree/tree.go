@@ -18,35 +18,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package tree
 
-import (
-	"strings"
-)
+import "github.com/r7wx/luna-dns/internal/entry"
 
-type entry struct {
-	domain     string
-	ip         string
-	tld        string
-	subdomains []string
-}
-
-func newEntry(domain, ip string) (*entry, error) {
-	elements := strings.Split(domain, ".")
-	if len(elements) == 1 && elements[0] != "*" {
-		return nil,
-			newError("invalid domain: " + domain)
-	}
-
-	subdomains := []string{}
-	for i := len(elements) - 2; i >= 0; i-- {
-		subdomains = append(subdomains, elements[i])
-	}
-
-	return &entry{
-		domain:     domain,
-		ip:         ip,
-		tld:        elements[len(elements)-1],
-		subdomains: subdomains,
-	}, nil
+// Tree - Tree interface
+type Tree interface {
+	Insert(entry *entry.Entry)
+	Search(entry *entry.Entry) string
 }

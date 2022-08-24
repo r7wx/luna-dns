@@ -18,39 +18,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package entry
 
 import (
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/logger"
+	"testing"
 )
 
-type overrides struct {
-	domainTree *domainTree
-}
-
-func newOverrides(config *config.Config) (*overrides, error) {
-	overrides := &overrides{domainTree: &domainTree{}}
-	for _, override := range config.Overrides {
-		entry, err := newEntry(override.Domain, override.IP)
-		if err != nil {
-			return nil, err
-		}
-		overrides.insert(entry)
-	}
-
-	return overrides, nil
-}
-
-func (o *overrides) insert(entry *entry) {
-	o.domainTree.insert(entry)
-}
-
-func (o *overrides) searchDomain(domain string) string {
-	entry, err := newEntry(domain, "")
+func TestEntry(t *testing.T) {
+	_, err := NewEntry("google.com", "127.0.0.1")
 	if err != nil {
-		logger.Error(err)
-		return ""
+		t.Fatal(err)
 	}
-	return o.domainTree.search(entry)
+
+	_, err = NewEntry("test", "127.0.0.1")
+	if err == nil {
+		t.Fatal()
+	}
 }
