@@ -21,7 +21,10 @@ SOFTWARE.
 package engine
 
 import (
+	"time"
+
 	"github.com/miekg/dns"
+	"github.com/r7wx/luna-dns/internal/cache"
 	"github.com/r7wx/luna-dns/internal/config"
 	"github.com/r7wx/luna-dns/internal/entry"
 	"github.com/r7wx/luna-dns/internal/logger"
@@ -31,6 +34,7 @@ import (
 // Engine - DNS Engine
 type Engine struct {
 	overrides *tree.Tree
+	cache     *cache.Cache
 	addr      string
 	protocol  string
 	dns       []string
@@ -52,6 +56,7 @@ func NewEngine(config *config.Config) (*Engine, error) {
 	logger.Info("Engine ready")
 	return &Engine{
 		overrides: tree.NewTree(overrides),
+		cache:     cache.NewCache(time.Minute * 10),
 		addr:      config.Addr,
 		protocol:  config.Protocol,
 		dns:       config.DNS,
@@ -60,6 +65,8 @@ func NewEngine(config *config.Config) (*Engine, error) {
 
 // Start - Start Engine DNS server
 func (e *Engine) Start() error {
+	go e.cache.Routine()
+
 	logger.Info("Engine listening on: " + e.addr + " (" +
 		e.protocol + ")")
 
