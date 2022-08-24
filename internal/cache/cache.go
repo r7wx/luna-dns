@@ -51,7 +51,7 @@ func NewCache(ttl time.Duration) *Cache {
 // Routine - Starts the cache cleaning routine
 func (c *Cache) Routine() {
 	for {
-		time.Sleep(1 * time.Minute)
+		time.Sleep(c.ttl)
 		logger.Info("Cleaning old cache entries...")
 
 		deletedDomains := 0

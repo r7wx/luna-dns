@@ -56,7 +56,12 @@ func (e *Engine) queryA(domain string) string {
 	}
 	logger.Debug("No override match for: " + domain)
 
-	// TODO: Search in Cache
+	ip = e.cache.SearchDomain(domain)
+	if ip != "" {
+		logger.Debug("Cache match for " + domain +
+			": " + ip)
+		return ip
+	}
 	logger.Debug("No cache match for: " + domain)
 
 	// TODO: Fallback request to DNS servers

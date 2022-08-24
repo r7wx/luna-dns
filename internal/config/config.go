@@ -33,13 +33,20 @@ type Override struct {
 	IP     string `yaml:"ip"`
 }
 
+// DNS - DNS server configuration struct
+type DNS struct {
+	Addr     string `yaml:"addr"`
+	Protocol string `yaml:"protocol"`
+}
+
 // Config - Main configuration struct
 type Config struct {
 	Addr      string     `yaml:"addr"`
 	Protocol  string     `yaml:"protocol"`
-	DNS       []string   `yaml:"dns"`
+	DNS       []DNS      `yaml:"dns"`
 	Overrides []Override `yaml:"overrides"`
 	Debug     bool       `yaml:"debug"`
+	CacheTTL  int64      `yaml:"cache_ttl"`
 }
 
 // Load - Load configuration from file

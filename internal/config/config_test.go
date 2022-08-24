@@ -46,8 +46,8 @@ func TestConfig(t *testing.T) {
 protocol: tcp
 debug: true
 dns:
-  - 8.8.8.8
-  - 8.8.4.4
+  - addr: "8.8.8.8:53"
+    protocol: "udp"
 overrides:
   - domain: google.com
     ip: 127.0.0.1
@@ -66,7 +66,12 @@ overrides:
 	if config.Protocol != "tcp" {
 		t.Fatal()
 	}
-	if !reflect.DeepEqual(config.DNS, []string{"8.8.8.8", "8.8.4.4"}) {
+	if !reflect.DeepEqual(config.DNS, []DNS{
+		{
+			Addr:     "8.8.8.8:53",
+			Protocol: "udp",
+		},
+	}) {
 		t.Fatal()
 	}
 	if !reflect.DeepEqual(config.Overrides, []Override{

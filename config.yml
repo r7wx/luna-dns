@@ -1,9 +1,12 @@
-addr: 0.0.0.0:5355
-protocol: udp
+addr: "0.0.0.0:5355"
+protocol: "udp"
+cache_ttl: 600
 debug: true
 dns:
-  - 8.8.8.8
-  - 8.8.4.4
+  - addr: "8.8.8.8:53"
+    protocol: "udp"
+  - addr: "8.8.4.4:53"
+    protocol: "udp"
 overrides:
   - domain: google.com
     ip: 127.0.1.1

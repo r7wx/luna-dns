@@ -37,7 +37,7 @@ type Engine struct {
 	cache     *cache.Cache
 	addr      string
 	protocol  string
-	dns       []string
+	dns       []config.DNS
 }
 
 // NewEngine - Create a new engine
@@ -56,10 +56,11 @@ func NewEngine(config *config.Config) (*Engine, error) {
 	logger.Info("Engine ready")
 	return &Engine{
 		overrides: tree.NewTree(overrides),
-		cache:     cache.NewCache(time.Minute * 10),
-		addr:      config.Addr,
-		protocol:  config.Protocol,
-		dns:       config.DNS,
+		cache: cache.NewCache(time.Duration(config.CacheTTL) *
+			time.Second),
+		addr:     config.Addr,
+		protocol: config.Protocol,
+		dns:      config.DNS,
 	}, nil
 }
 
