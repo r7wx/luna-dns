@@ -43,5 +43,13 @@ func main() {
 	}
 	logger.Info("Configuration file loaded: " + args[0])
 
-	engine.NewEngine(config)
+	engine, err := engine.NewEngine(config)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = engine.Start()
+	if err != nil {
+		logger.Fatal(err)
+	}
 }

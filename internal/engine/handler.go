@@ -21,55 +21,21 @@ SOFTWARE.
 package engine
 
 import (
+	"strings"
+
 	"github.com/miekg/dns"
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/entry"
 	"github.com/r7wx/luna-dns/internal/logger"
-	"github.com/r7wx/luna-dns/internal/tree"
 )
 
-// Engine - DNS Engine
-type Engine struct {
-	overrides *tree.Tree
-	addr      string
-	protocol  string
-	dns       []string
-}
+func (e *Engine) handler(w dns.ResponseWriter, r *dns.Msg) {
+	message := dns.Msg{}
+	message.SetReply(r)
+	logger.Debug(strings.ReplaceAll(message.String(), "\n", ""))
 
-// NewEngine - Create a new engine
-func NewEngine(config *config.Config) (*Engine, error) {
-	logger.Info("Initializing engine...")
-
-	overrides := []entry.Entry{}
-	for _, override := range config.Overrides {
-		entry, err := entry.NewEntry(override.Domain, override.IP)
-		if err != nil {
-			return nil, err
-		}
-		overrides = append(overrides, *entry)
+	switch r.Opcode {
+	case dns.OpcodeQuery:
+		e.query(&message)
 	}
 
-	logger.Info("Engine ready")
-	return &Engine{
-		overrides: tree.NewTree(overrides),
-		addr:      config.Addr,
-		protocol:  config.Protocol,
-		dns:       config.DNS,
-	}, nil
-}
-
-// Start - Start Engine DNS server
-func (e *Engine) Start() error {
-	logger.Info("Engine listening on: " + e.addr + " (" +
-		e.protocol + ")")
-
-	dns.HandleFunc(".", e.handler)
-	server := &dns.Server{Addr: e.addr, Net: e.protocol}
-	err := server.ListenAndServe()
-	if err != nil {
-		return err
-	}
-	defer server.Shutdown()
-
-	return nil
+	w.WriteMsg(&message)
 }

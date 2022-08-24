@@ -1,18 +1,13 @@
-addr: 0.0.0.0:5353
-protocol: tcp
+addr: 0.0.0.0:5355
+protocol: udp
+debug: true
 dns:
   - 8.8.8.8
   - 8.8.4.4
 overrides:
   - domain: google.com
-    ip: 8.8.8.8
-  - domain: "*.test.uk"
+    ip: 127.0.1.1
+  - domain: "test.com"
     ip: 127.0.0.1
-  - domain: "*.aaa.test.abc"
-    ip: 127.0.0.1
-  - domain: test.com
-    ip: 127.0.0.1
-  - domain: cccc.com
-    ip: 127.0.0.1
-  - domain: zzzz.com
+  - domain: "*.test.com"
     ip: 127.0.0.1

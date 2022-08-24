@@ -21,55 +21,46 @@ SOFTWARE.
 package engine
 
 import (
+	"fmt"
+
 	"github.com/miekg/dns"
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/entry"
 	"github.com/r7wx/luna-dns/internal/logger"
-	"github.com/r7wx/luna-dns/internal/tree"
 )
 
-// Engine - DNS Engine
-type Engine struct {
-	overrides *tree.Tree
-	addr      string
-	protocol  string
-	dns       []string
-}
+func (e *Engine) query(m *dns.Msg) {
+	for _, q := range m.Question {
+		switch q.Qtype {
+		case dns.TypeA:
+			ip := e.queryA(q.Name[:len(q.Name)-1])
+			if ip != "" {
+				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+				if err == nil {
+					m.Answer = append(m.Answer, rr)
+				}
+			}
 
-// NewEngine - Create a new engine
-func NewEngine(config *config.Config) (*Engine, error) {
-	logger.Info("Initializing engine...")
-
-	overrides := []entry.Entry{}
-	for _, override := range config.Overrides {
-		entry, err := entry.NewEntry(override.Domain, override.IP)
-		if err != nil {
-			return nil, err
+		default:
+			fmt.Println("TODO: Redirect query")
 		}
-		overrides = append(overrides, *entry)
 	}
-
-	logger.Info("Engine ready")
-	return &Engine{
-		overrides: tree.NewTree(overrides),
-		addr:      config.Addr,
-		protocol:  config.Protocol,
-		dns:       config.DNS,
-	}, nil
 }
 
-// Start - Start Engine DNS server
-func (e *Engine) Start() error {
-	logger.Info("Engine listening on: " + e.addr + " (" +
-		e.protocol + ")")
+func (e *Engine) queryA(domain string) string {
+	logger.Debug("Searching for domain: " + domain)
 
-	dns.HandleFunc(".", e.handler)
-	server := &dns.Server{Addr: e.addr, Net: e.protocol}
-	err := server.ListenAndServe()
-	if err != nil {
-		return err
+	ip := e.overrides.SearchDomain(domain)
+	if ip != "" {
+		logger.Debug("Override match for " + domain +
+			": " + ip)
+		return ip
 	}
-	defer server.Shutdown()
+	logger.Debug("No override match for: " + domain)
 
-	return nil
+	// TODO: Search in Cache
+	logger.Debug("No cache match for: " + domain)
+
+	// TODO: Fallback request to DNS servers
+	// TODO: Add to cache (goroutine)
+
+	return ""
 }

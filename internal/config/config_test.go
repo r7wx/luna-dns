@@ -44,6 +44,7 @@ func TestConfig(t *testing.T) {
 
 	filePath := writeFile(t, []byte(`addr: 0.0.0.0:5353
 protocol: tcp
+debug: true
 dns:
   - 8.8.8.8
   - 8.8.4.4

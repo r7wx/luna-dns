@@ -23,17 +23,9 @@ package config
 import (
 	"io/ioutil"
 
+	"github.com/r7wx/luna-dns/internal/logger"
 	"gopkg.in/yaml.v3"
 )
-
-// Protocol enum
-const (
-	TCP = "tcp"
-	UDP = "udp"
-)
-
-// Protocol enum type
-type Protocol string
 
 // Override - Override configuration struct
 type Override struct {
@@ -44,9 +36,10 @@ type Override struct {
 // Config - Main configuration struct
 type Config struct {
 	Addr      string     `yaml:"addr"`
-	Protocol  Protocol   `yaml:"protocol"`
+	Protocol  string     `yaml:"protocol"`
 	DNS       []string   `yaml:"dns"`
 	Overrides []Override `yaml:"overrides"`
+	Debug     bool       `yaml:"debug"`
 }
 
 // Load - Load configuration from file
@@ -58,5 +51,10 @@ func Load(filepath string) (*Config, error) {
 
 	config := &Config{}
 	err = yaml.Unmarshal(confBytes, config)
+
+	if config.Debug {
+		logger.DebugEnabled = true
+	}
+
 	return config, err
 }
