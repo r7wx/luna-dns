@@ -1,10 +1,10 @@
 addr: "0.0.0.0:5355"
 protocol: "udp"
-cache_ttl: 600
+cache_ttl: 14400
 debug: true
 dns:
   - addr: "8.8.8.8:53"
-    protocol: "udp"
+    protocol: "tcp"
   - addr: "8.8.4.4:53"
     protocol: "udp"
 overrides:

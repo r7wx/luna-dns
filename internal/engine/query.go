@@ -24,48 +24,24 @@ import (
 	"fmt"
 
 	"github.com/miekg/dns"
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
-func (e *Engine) query(m *dns.Msg) {
-	for _, q := range m.Question {
+func (e *Engine) query(message *dns.Msg) {
+	for _, q := range message.Question {
 		switch q.Qtype {
 		case dns.TypeA:
-			ip := e.queryA(q.Name[:len(q.Name)-1])
-			if ip != "" {
-				rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
-				if err == nil {
-					m.Answer = append(m.Answer, rr)
-				}
+			ip := e.overrides.SearchDomain(q.Name[:len(q.Name)-1])
+			if ip == "" {
+				e.remoteFallback(message)
+				return
 			}
 
+			rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+			if err == nil {
+				message.Answer = append(message.Answer, rr)
+			}
 		default:
-			fmt.Println("TODO: Redirect query")
+			e.remoteFallback(message)
 		}
 	}
-}
-
-func (e *Engine) queryA(domain string) string {
-	logger.Debug("Searching for domain: " + domain)
-
-	ip := e.overrides.SearchDomain(domain)
-	if ip != "" {
-		logger.Debug("Override match for " + domain +
-			": " + ip)
-		return ip
-	}
-	logger.Debug("No override match for: " + domain)
-
-	ip = e.cache.SearchDomain(domain)
-	if ip != "" {
-		logger.Debug("Cache match for " + domain +
-			": " + ip)
-		return ip
-	}
-	logger.Debug("No cache match for: " + domain)
-
-	// TODO: Fallback request to DNS servers
-	// TODO: Add to cache (goroutine)
-
-	return ""
 }

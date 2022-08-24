@@ -25,18 +25,19 @@ import (
 	"sync"
 	"time"
 
+	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/logger"
 )
 
-type cacheEntry struct {
+type entry struct {
 	createdAt time.Time
-	value     string
+	answer    []dns.RR
 }
 
 // Cache - DNS cache struct
 type Cache struct {
 	sync.Mutex
-	domains map[string]cacheEntry
+	entries map[string]entry
 	ttl     time.Duration
 }
 
@@ -44,45 +45,48 @@ type Cache struct {
 func NewCache(ttl time.Duration) *Cache {
 	return &Cache{
 		ttl:     ttl,
-		domains: map[string]cacheEntry{},
+		entries: map[string]entry{},
 	}
 }
 
 // Routine - Starts the cache cleaning routine
 func (c *Cache) Routine() {
 	for {
-		time.Sleep(c.ttl)
+		time.Sleep(c.ttl + (5 * time.Second))
 		logger.Info("Cleaning old cache entries...")
 
-		deletedDomains := 0
-		for domain, entry := range c.domains {
+		deletedEntries := 0
+		for hash, entry := range c.entries {
 			delta := time.Now().Sub(entry.createdAt)
 			if delta > c.ttl {
-				delete(c.domains, domain)
-				deletedDomains++
+				delete(c.entries, hash)
+				deletedEntries++
 			}
 		}
 
-		if deletedDomains > 0 {
-			logger.Info("Deleted " + fmt.Sprint(deletedDomains) +
-				" domains from cache")
+		if deletedEntries > 0 {
+			logger.Info("Deleted " + fmt.Sprint(deletedEntries) +
+				" entries from cache")
 		}
 	}
 }
 
-// SearchDomain - Search for a domain in Cache
-func (c *Cache) SearchDomain(domain string) string {
+// Search - Search for DNS answer in cache
+func (c *Cache) Search(question []dns.Question) []dns.RR {
 	c.Lock()
 	defer c.Unlock()
-	return c.domains[domain].value
+	return c.entries[hashQuestion(question)].answer
 }
 
-// InsertDomain - Insert a new domain in Cache
-func (c *Cache) InsertDomain(domain, ip string) {
+// Insert - Insert a new entry in Cache
+func (c *Cache) Insert(question []dns.Question, answer []dns.RR) {
 	c.Lock()
 	defer c.Unlock()
-	c.domains[domain] = cacheEntry{
+
+	hash := hashQuestion(question)
+	c.entries[hash] = entry{
 		createdAt: time.Now(),
-		value:     ip,
+		answer:    answer,
 	}
+	logger.Debug("New entry in cache: " + hash)
 }

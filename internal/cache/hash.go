@@ -18,28 +18,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package engine
+package cache
 
 import (
-	"strings"
+	"crypto/sha1"
+	"encoding/hex"
 
 	"github.com/miekg/dns"
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
-func (e *Engine) handler(w dns.ResponseWriter, r *dns.Msg) {
-	message := dns.Msg{}
-	message.SetReply(r)
-
-	logger.Debug(strings.ReplaceAll(message.String(),
-		"\n", ""))
-
-	switch r.Opcode {
-	case dns.OpcodeQuery:
-		e.query(&message)
-	default:
-		e.remoteFallback(&message)
+func hashQuestion(question []dns.Question) string {
+	hashSTR := ""
+	for _, q := range question {
+		hashSTR += q.String()
 	}
 
-	w.WriteMsg(&message)
+	h := sha1.New()
+	h.Write([]byte(hashSTR))
+
+	return hex.EncodeToString(h.Sum(nil))
 }
