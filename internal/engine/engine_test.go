@@ -27,7 +27,14 @@ import (
 )
 
 func TestNewEngine(t *testing.T) {
-	_, err := NewEngine(&config.Config{})
+	_, err := NewEngine(&config.Config{
+		Overrides: []config.Override{
+			{
+				Domain: "google.com",
+				IP:     "127.0.0.1",
+			},
+		},
+	})
 	if err != nil {
 		t.Fatal()
 	}

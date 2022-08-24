@@ -18,46 +18,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package override
+package tree
 
 import (
-	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/dtree"
+	"testing"
+
 	"github.com/r7wx/luna-dns/internal/entry"
-	"github.com/r7wx/luna-dns/internal/logger"
-	"github.com/r7wx/luna-dns/internal/tree"
 )
 
-// Override - DNS overrides struct
-type Override struct {
-	domainTree tree.Tree
-}
+func TestTree(t *testing.T) {
+	testEntry, _ := entry.NewEntry("google.com", "127.0.0.1")
+	tree := NewTree([]entry.Entry{*testEntry})
 
-func NewOverride(config *config.Config) (*Override, error) {
-	override := &Override{
-		domainTree: dtree.NewDTree(),
+	testEntry, _ = entry.NewEntry("*.google.com", "8.8.8.8")
+	tree.Insert(testEntry)
+
+	found := tree.SearchDomain("google.com")
+	if found != "127.0.0.1" {
+		t.Fatal()
 	}
 
-	for _, configOverride := range config.Overrides {
-		entry, err := entry.NewEntry(configOverride.Domain, configOverride.IP)
-		if err != nil {
-			return nil, err
-		}
-		override.Insert(entry)
+	found = tree.SearchDomain("test.google.com")
+	if found != "8.8.8.8" {
+		t.Fatal()
 	}
 
-	return override, nil
-}
-
-func (o *Override) Insert(entry *entry.Entry) {
-	o.domainTree.Insert(entry)
-}
-
-func (o *Override) SearchDomain(domain string) string {
-	entry, err := entry.NewEntry(domain, "")
-	if err != nil {
-		logger.Error(err)
-		return ""
+	found = tree.SearchDomain("xxxx")
+	if found != "" {
+		t.Fatal()
 	}
-	return o.domainTree.Search(entry)
 }

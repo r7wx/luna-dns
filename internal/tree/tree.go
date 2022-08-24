@@ -20,10 +20,41 @@ SOFTWARE.
 
 package tree
 
-import "github.com/r7wx/luna-dns/internal/entry"
+import (
+	"github.com/r7wx/luna-dns/internal/dtree"
+	"github.com/r7wx/luna-dns/internal/entry"
+	"github.com/r7wx/luna-dns/internal/logger"
+)
 
-// Tree - Tree interface
-type Tree interface {
-	Insert(entry *entry.Entry)
-	Search(entry *entry.Entry) string
+// Tree - Tree struct
+type Tree struct {
+	domainTree *dtree.DTree
+}
+
+// NewTree - Create a new tree
+func NewTree(entries []entry.Entry) *Tree {
+	tree := &Tree{
+		domainTree: dtree.NewDTree(),
+	}
+
+	for _, entry := range entries {
+		tree.Insert(&entry)
+	}
+
+	return tree
+}
+
+// Insert - Insert an entry in Tree
+func (t *Tree) Insert(entry *entry.Entry) {
+	t.domainTree.Insert(entry)
+}
+
+// SearchDomain - Search for a domain in Tree
+func (t *Tree) SearchDomain(domain string) string {
+	entry, err := entry.NewEntry(domain, "")
+	if err != nil {
+		logger.Error(err)
+		return ""
+	}
+	return t.domainTree.Search(entry)
 }
