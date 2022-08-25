@@ -22,7 +22,9 @@ package engine
 
 import (
 	"testing"
+	"time"
 
+	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/config"
 )
 
@@ -47,6 +49,66 @@ func TestNewEngine(t *testing.T) {
 		},
 	})
 	if err == nil {
+		t.Fatal()
+	}
+}
+
+func TestQuery(t *testing.T) {
+	dns.HandleFunc(".", func(w dns.ResponseWriter, r *dns.Msg) {
+		message := dns.Msg{}
+		message.SetReply(r)
+		rr, _ := dns.NewRR("test.test. A 127.0.0.1")
+		message.Answer = append(message.Answer, rr)
+		w.WriteMsg(&message)
+	})
+
+	testServer := &dns.Server{Addr: "127.0.0.1:55553", Net: "udp"}
+	go testServer.ListenAndServe()
+	defer testServer.Shutdown()
+
+	engine, _ := NewEngine(&config.Config{
+		DNS: []config.DNS{
+			{
+				Addr:    "xxxxxxxx",
+				Network: "udp",
+			},
+			{
+				Addr:    "127.0.0.1:55553",
+				Network: "udp",
+			},
+		},
+		Hosts: []config.Host{
+			{
+				Domain: "google.com",
+				IP:     "127.0.0.1",
+			},
+		},
+	})
+
+	testMessage := new(dns.Msg)
+	testMessage.SetQuestion("google.com.", dns.TypeA)
+	engine.query(testMessage)
+	if len(testMessage.Answer) == 0 {
+		t.Fatal()
+	}
+
+	testMessage = new(dns.Msg)
+	testMessage.SetQuestion("go.dev.", dns.TypeA)
+	engine.query(testMessage)
+	if len(testMessage.Answer) == 0 {
+		t.Fatal()
+	}
+	time.Sleep(1 * time.Second)
+	testMessage.Answer = []dns.RR{}
+	engine.query(testMessage)
+	if len(testMessage.Answer) == 0 {
+		t.Fatal()
+	}
+
+	testMessage = new(dns.Msg)
+	testMessage.SetQuestion("go.dev.", dns.TypeTXT)
+	engine.query(testMessage)
+	if len(testMessage.Answer) == 0 {
 		t.Fatal()
 	}
 }

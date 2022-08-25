@@ -21,48 +21,36 @@ SOFTWARE.
 package cache
 
 import (
-	"sync"
+	"fmt"
 	"time"
 
-	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/logger"
 )
 
-// Cache - DNS cache struct
-type Cache struct {
-	sync.Mutex
-	entries map[string]entry
-	ttl     time.Duration
-}
-type entry struct {
-	createdAt time.Time
-	answer    []dns.RR
-}
+// Routine - Starts the cache cleaning routine
+func (c *Cache) Routine() {
+	for {
+		time.Sleep(c.ttl + (5 * time.Second))
+		logger.Info("Cleaning old cache entries...")
 
-// NewCache - Create a new cache struct
-func NewCache(ttl time.Duration) *Cache {
-	return &Cache{
-		ttl:     ttl,
-		entries: map[string]entry{},
+		deletedEntries := c.deleteOldEntries()
+		if deletedEntries > 0 {
+			logger.Info("Deleted " + fmt.Sprint(deletedEntries) +
+				" entries from cache")
+		}
 	}
 }
 
-// Search - Search for DNS answer in cache
-func (c *Cache) Search(question []dns.Question) []dns.RR {
-	c.Lock()
-	defer c.Unlock()
-	return c.entries[hashQuestion(question)].answer
-}
+func (c *Cache) deleteOldEntries() int {
+	deletedEntries := 0
 
-// Insert - Insert a new entry in Cache
-func (c *Cache) Insert(question []dns.Question, answer []dns.RR) {
-	c.Lock()
-	defer c.Unlock()
-
-	hash := hashQuestion(question)
-	c.entries[hash] = entry{
-		createdAt: time.Now(),
-		answer:    answer,
+	for hash, entry := range c.entries {
+		delta := time.Now().Sub(entry.createdAt)
+		if delta > c.ttl {
+			delete(c.entries, hash)
+			deletedEntries++
+		}
 	}
-	logger.Debug("New entry in cache: " + hash)
+
+	return deletedEntries
 }

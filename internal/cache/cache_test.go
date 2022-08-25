@@ -46,4 +46,10 @@ func TestCache(t *testing.T) {
 	if !reflect.DeepEqual(found[0], rr) {
 		t.Fatal()
 	}
+
+	time.Sleep(1 * time.Millisecond)
+	deleted := cache.deleteOldEntries()
+	if deleted == 0 {
+		t.Fatal()
+	}
 }
