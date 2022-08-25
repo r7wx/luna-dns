@@ -36,7 +36,6 @@ func main() {
 	if len(args) <= 0 {
 		logger.Fatal("no configuration file provided")
 	}
-
 	config, err := config.Load(args[0])
 	if err != nil {
 		logger.Fatal(err)
@@ -47,9 +46,7 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-
-	err = engine.Start()
-	if err != nil {
+	if err := engine.Start(); err != nil {
 		logger.Fatal(err)
 	}
 }

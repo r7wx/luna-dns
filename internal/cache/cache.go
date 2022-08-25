@@ -29,16 +29,15 @@ import (
 	"github.com/r7wx/luna-dns/internal/logger"
 )
 
-type entry struct {
-	createdAt time.Time
-	answer    []dns.RR
-}
-
 // Cache - DNS cache struct
 type Cache struct {
 	sync.Mutex
 	entries map[string]entry
 	ttl     time.Duration
+}
+type entry struct {
+	createdAt time.Time
+	answer    []dns.RR
 }
 
 // NewCache - Create a new cache struct

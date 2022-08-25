@@ -18,20 +18,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package tree
+package cache
 
-// Tree - DNS tree struct
-type Tree struct {
-	tlds map[string]*node
-}
-type node struct {
-	childrens map[string]*node
-	ip        string
-}
+import (
+	"fmt"
+	"reflect"
+	"testing"
+	"time"
 
-// NewTree - Create a new DNS tree
-func NewTree() *Tree {
-	return &Tree{
-		tlds: map[string]*node{},
+	"github.com/miekg/dns"
+)
+
+func TestCache(t *testing.T) {
+	cache := NewCache(1 * time.Millisecond)
+
+	rr, _ := dns.NewRR(fmt.Sprintf("%s A %s", "test", "127.0.0.1"))
+	question := dns.Question{
+		Name:   "test",
+		Qtype:  1,
+		Qclass: 1,
+	}
+	cache.Insert([]dns.Question{question}, []dns.RR{rr})
+	found := cache.Search([]dns.Question{question})
+	if found == nil {
+		t.Fatal()
+	}
+	if !reflect.DeepEqual(found[0], rr) {
+		t.Fatal()
 	}
 }
