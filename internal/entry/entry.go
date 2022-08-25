@@ -27,18 +27,18 @@ import (
 
 // Entry - Entry struct
 type Entry struct {
-	Domain     string
+	Host       string
 	IP         string
 	TLD        string
 	Subdomains []string
 }
 
 // NewEntry - Create a new entry
-func NewEntry(domain, ip string) (*Entry, error) {
-	elements := strings.Split(domain, ".")
+func NewEntry(host, ip string) (*Entry, error) {
+	elements := strings.Split(host, ".")
 	if len(elements) == 1 && elements[0] != "*" {
 		return nil,
-			fmt.Errorf("invalid domain: %s", domain)
+			fmt.Errorf("invalid host: %s", host)
 	}
 
 	subdomains := []string{}
@@ -47,7 +47,7 @@ func NewEntry(domain, ip string) (*Entry, error) {
 	}
 
 	return &Entry{
-		Domain:     domain,
+		Host:       host,
 		IP:         ip,
 		TLD:        elements[len(elements)-1],
 		Subdomains: subdomains,

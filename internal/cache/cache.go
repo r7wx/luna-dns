@@ -64,5 +64,6 @@ func (c *Cache) Insert(question []dns.Question, answer []dns.RR) {
 		createdAt: time.Now(),
 		answer:    answer,
 	}
-	logger.Debug("New entry in cache: " + hash)
+	logger.Debug("New entry in cache: " +
+		hash)
 }

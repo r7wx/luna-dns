@@ -32,8 +32,8 @@ func TestNewEngine(t *testing.T) {
 	_, err := NewEngine(&config.Config{
 		Hosts: []config.Host{
 			{
-				Domain: "google.com",
-				IP:     "127.0.0.1",
+				Host: "google.com",
+				IP:   "127.0.0.1",
 			},
 		},
 	})
@@ -44,7 +44,7 @@ func TestNewEngine(t *testing.T) {
 	_, err = NewEngine(&config.Config{
 		Hosts: []config.Host{
 			{
-				Domain: "x",
+				Host: "x",
 			},
 		},
 	})
@@ -79,8 +79,8 @@ func TestQuery(t *testing.T) {
 		},
 		Hosts: []config.Host{
 			{
-				Domain: "google.com",
-				IP:     "127.0.0.1",
+				Host: "google.com",
+				IP:   "127.0.0.1",
 			},
 		},
 	})

@@ -8,9 +8,9 @@ dns:
   - addr: "8.8.4.4:53"
     network: "udp"
 hosts:
-  - domain: google.com
+  - host: google.com
     ip: 127.0.1.1
-  - domain: "test.com"
+  - host: "test.com"
     ip: 127.0.0.1
-  - domain: "*.test.com"
+  - host: "*.test.com"
     ip: 127.0.0.1

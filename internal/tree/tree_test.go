@@ -29,10 +29,10 @@ import (
 func TestBasics(t *testing.T) {
 	testEntries := func(tree *Tree, entries []map[string]string, t *testing.T) {
 		for _, e := range entries {
-			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			testEntry, _ := entry.NewEntry(e["host"], e["ip"])
 			tree.Insert(testEntry)
 
-			found, _ := tree.Search(testEntry.Domain)
+			found, _ := tree.Search(testEntry.Host)
 			if found == "" {
 				t.Fatal()
 				continue
@@ -47,16 +47,16 @@ func TestBasics(t *testing.T) {
 	tree := NewTree()
 	testEntries(tree, []map[string]string{
 		{
-			"domain": "test.com",
-			"ip":     "127.0.0.1",
+			"host": "test.com",
+			"ip":   "127.0.0.1",
 		},
 		{
-			"domain": "a.test.com",
-			"ip":     "127.0.0.1",
+			"host": "a.test.com",
+			"ip":   "127.0.0.1",
 		},
 		{
-			"domain": "test.a",
-			"ip":     "127.0.0.1",
+			"host": "test.a",
+			"ip":   "127.0.0.1",
 		},
 	}, t)
 }
@@ -64,7 +64,7 @@ func TestBasics(t *testing.T) {
 func TestOthers(t *testing.T) {
 	insertEntries := func(tree *Tree, entries []map[string]string) {
 		for _, e := range entries {
-			testEntry, _ := entry.NewEntry(e["domain"], e["ip"])
+			testEntry, _ := entry.NewEntry(e["host"], e["ip"])
 			tree.Insert(testEntry)
 		}
 	}
@@ -72,10 +72,10 @@ func TestOthers(t *testing.T) {
 	searchDomains := func(tree *Tree, entries []map[string]any,
 		t *testing.T) {
 		for _, e := range entries {
-			domain := e["domain"].(string)
+			host := e["host"].(string)
 			expected := e["expected"].(bool)
 
-			found, _ := tree.Search(domain)
+			found, _ := tree.Search(host)
 			if found == "" && expected {
 				t.Fatal()
 			}
@@ -88,42 +88,42 @@ func TestOthers(t *testing.T) {
 	tree := NewTree()
 	insertEntries(tree, []map[string]string{
 		{
-			"domain": "*.test.com",
-			"ip":     "127.0.0.1",
+			"host": "*.test.com",
+			"ip":   "127.0.0.1",
 		},
 		{
-			"domain": "*.tld",
-			"ip":     "127.0.0.1",
+			"host": "*.tld",
+			"ip":   "127.0.0.1",
 		},
 	})
 	searchDomains(tree, []map[string]any{
 		{
-			"domain":   "unk.com",
+			"host":     "unk.com",
 			"expected": false,
 		},
 		{
-			"domain":   "aaa.test.com",
+			"host":     "aaa.test.com",
 			"expected": true,
 		},
 		{
-			"domain":   "test.tld",
+			"host":     "test.tld",
 			"expected": true,
 		},
 		{
-			"domain":   "test.xxx",
+			"host":     "test.xxx",
 			"expected": false,
 		},
 	}, t)
 
 	insertEntries(tree, []map[string]string{
 		{
-			"domain": "*",
-			"ip":     "127.0.0.1",
+			"host": "*",
+			"ip":   "127.0.0.1",
 		},
 	})
 	searchDomains(tree, []map[string]any{
 		{
-			"domain":   "google.com",
+			"host":     "google.com",
 			"expected": true,
 		},
 	}, t)

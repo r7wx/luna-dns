@@ -29,8 +29,8 @@ import (
 
 // Host - Host configuration struct
 type Host struct {
-	Domain string `yaml:"domain"`
-	IP     string `yaml:"ip"`
+	Host string `yaml:"host"`
+	IP   string `yaml:"ip"`
 }
 
 // DNS - DNS server configuration struct

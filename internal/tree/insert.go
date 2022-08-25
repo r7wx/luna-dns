@@ -42,8 +42,8 @@ func (t *Tree) Insert(entry *entry.Entry) {
 	}
 }
 
-func (t *Tree) insertNode(nodes *map[string]*node, domain string, ip string) *node {
-	if domain == "*" {
+func (t *Tree) insertNode(nodes *map[string]*node, host string, ip string) *node {
+	if host == "*" {
 		for k := range *nodes {
 			delete(*nodes, k)
 		}
@@ -52,15 +52,15 @@ func (t *Tree) insertNode(nodes *map[string]*node, domain string, ip string) *no
 			childrens: map[string]*node{},
 		}
 
-		insertedNode, _ := searchNode(nodes, domain)
+		insertedNode, _ := searchNode(nodes, host)
 		return insertedNode
 	}
 
-	(*nodes)[domain] = &node{
+	(*nodes)[host] = &node{
 		ip:        ip,
 		childrens: map[string]*node{},
 	}
 
-	insertedNode, _ := searchNode(nodes, domain)
+	insertedNode, _ := searchNode(nodes, host)
 	return insertedNode
 }

@@ -49,9 +49,9 @@ dns:
   - addr: "8.8.8.8:53"
     network: "udp"
 hosts:
-  - domain: google.com
+  - host: google.com
     ip: 127.0.0.1
-  - domain: "*.test.com"
+  - host: "*.test.com"
     ip: 127.0.0.1`))
 	defer os.Remove(filePath)
 
@@ -76,12 +76,12 @@ hosts:
 	}
 	if !reflect.DeepEqual(config.Hosts, []Host{
 		{
-			Domain: "google.com",
-			IP:     "127.0.0.1",
+			Host: "google.com",
+			IP:   "127.0.0.1",
 		},
 		{
-			Domain: "*.test.com",
-			IP:     "127.0.0.1",
+			Host: "*.test.com",
+			IP:   "127.0.0.1",
 		},
 	}) {
 		t.Fatal()

@@ -42,18 +42,15 @@ type Engine struct {
 
 // NewEngine - Create a new engine
 func NewEngine(config *config.Config) (*Engine, error) {
-	logger.Info("Initializing engine...")
-
 	Hosts := tree.NewTree()
 	for _, host := range config.Hosts {
-		entry, err := entry.NewEntry(host.Domain, host.IP)
+		entry, err := entry.NewEntry(host.Host, host.IP)
 		if err != nil {
 			return nil, err
 		}
 		Hosts.Insert(entry)
 	}
 
-	logger.Info("Engine ready")
 	return &Engine{
 		Hosts: Hosts,
 		cache: cache.NewCache(time.Duration(config.CacheTTL) *
