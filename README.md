@@ -12,7 +12,7 @@
 
 ---
 
-<img src="assets/screenshot.png" />
+<img src="assets/screenshot.jpg" />
 
 <p align="justify">
 TODO
