@@ -1,0 +1,6 @@
+.git/
+.vscode/
+.github/
+build/
+dist/
+assets/
