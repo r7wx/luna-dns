@@ -7,6 +7,7 @@
 
 <p align="center">
 <img src="https://img.shields.io/github/v/release/r7wx/luna-dns" alt="Release" />
+<a href="https://github.com/r7wx/luna-dns/actions/workflows/build.yml" /><img src="https://github.com/r7wx/luna-dns/actions/workflows/build.yml/badge.svg" alt="Build"></a>
 <a href="https://www.codefactor.io/repository/github/r7wx/luna-dns"><img src="https://www.codefactor.io/repository/github/r7wx/luna-dns/badge?s=37c25430d7b6b31b86ad49810d6f89ef50629615" alt="CodeFactor" /></a>
 </p>
 
