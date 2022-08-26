@@ -17,14 +17,8 @@
 <img src="assets/screenshot.jpg" />
 
 <p align="justify">
-Luna DNS is a simple and easy configurable DNS forwarder with focus on custom hosts. Configuration of customs hosts is simple and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
+Luna DNS is a simple and easy-to-configure DNS forwarder, configuring customs hosts is easy and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
 </p>
-
-### Features
-
-- Runs as a standalone binary or as a docker container.
-- Easy to configure through a yml configuration file.
-- In memory cache.
 
 ## Deployment
 
@@ -69,7 +63,7 @@ The luna-dns image will always look for a configuration file in /etc/luna-dns/co
 ## Configuration
 
 <p align="justify">
-Luna DNS is configured by an YML configuration file. An example configuration is provided in the root directory of this repository (config.yml):
+Luna DNS is configured by an YAML configuration file. An example configuration is provided in the root directory of this repository (config.yml).
 </p>
 
 ```yml
@@ -87,10 +81,10 @@ dns:
 
 # custom hosts entries
 hosts:
-  - host: google.com # custom host domain or pattern (suppport for wildcard)
+  - host: google.com # custom host domain or pattern (wildcards supported)
     ip: 127.0.1.1 # custom host ip
   - host: "test.com"
     ip: 127.0.0.1
-  - host: "*.test.com" # example of wildcard pattern
+  - host: "*.test.com" # wildcard pattern example
     ip: 127.0.0.1
 ```
