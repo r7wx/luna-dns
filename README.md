@@ -17,5 +17,80 @@
 <img src="assets/screenshot.jpg" />
 
 <p align="justify">
-TODO
+Luna DNS is a simple and easy configurable DNS forwarder with focus on custom hosts. Configuration of customs hosts is simple and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
 </p>
+
+### Features
+
+- Runs as a standalone binary or as a docker container.
+- Easy to configure through a yml configuration file.
+- In memory cache.
+
+## Deployment
+
+### Standalone Executable
+
+<p align="justify">
+In order to run luna-dns as a standalone executable, you can build it from source code or download a pre-built binary from the latest release.
+</p>
+
+**Build from source:**
+
+```bash
+git clone https://github.com/r7wx/luna-dns.git
+cd luna-dns
+make
+```
+
+**Run executable:**
+
+```bash
+./luna-dns <path-to-config-file>
+```
+
+### Docker
+
+<p align="justify">
+You can deploy an instance of luna-dns by using Docker:
+</p>
+
+```bash
+docker run -d --name=luna-dns \
+  -p 5355:5355/udp \
+  -v /path/to/config.yml:/etc/luna-dns/config.yml \
+  --restart unless-stopped \
+  r7wx/luna-dns:latest
+```
+
+<p align="justify">
+The luna-dns image will always look for a configuration file in /etc/luna-dns/config.yml
+</p>
+
+## Configuration
+
+<p align="justify">
+Luna DNS is configured by an YML configuration file. An example configuration is provided in the root directory of this repository (config.yml):
+</p>
+
+```yml
+addr: "0.0.0.0:5355" # the address luna-dns will bind to
+network: "udp" # luna-dns server protocol (udp or tcp supported)
+cache_ttl: 14400 # after how long the cached data is cleared (expressed in seconds)
+debug: true # if true luna-dns will log debug information
+
+# remote dns servers to forward requests to (if not matching custom hosts)
+dns:
+  - addr: "8.8.8.8:53" # remote dns addr string
+    network: "tcp" # remote dns protocol (udp or tcp supported)
+  - addr: "8.8.4.4:53"
+    network: "udp"
+
+# custom hosts entries
+hosts:
+  - host: google.com # custom host domain or pattern (suppport for wildcard)
+    ip: 127.0.1.1 # custom host ip
+  - host: "test.com"
+    ip: 127.0.0.1
+  - host: "*.test.com" # example of wildcard pattern
+    ip: 127.0.0.1
+```
