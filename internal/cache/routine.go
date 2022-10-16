@@ -30,7 +30,7 @@ import (
 // Routine - Starts the cache cleaning routine
 func (c *Cache) Routine() {
 	for {
-		time.Sleep(c.ttl + (5 * time.Second))
+		time.Sleep(c.ttl + (1 * time.Second))
 		logger.Info("Cleaning old cache entries...")
 
 		deletedEntries := c.deleteOldEntries()
