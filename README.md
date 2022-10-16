@@ -9,14 +9,11 @@
 <img src="https://img.shields.io/github/v/release/r7wx/luna-dns" alt="Release" />
 <a href="https://github.com/r7wx/luna-dns/actions/workflows/build.yml" /><img src="https://github.com/r7wx/luna-dns/actions/workflows/build.yml/badge.svg" alt="Build"></a>
 <a href="https://github.com/r7wx/luna-dns/actions/workflows/test.yml" /><img src="https://github.com/r7wx/luna-dns/actions/workflows/test.yml/badge.svg" alt="Test"></a>
-<a href="https://codecov.io/gh/r7wx/luna-dns" ><img src="https://codecov.io/gh/r7wx/luna-dns/branch/master/graph/badge.svg?token=2VJYV1R39F"/> 
-</a>
+<a href="https://codecov.io/gh/r7wx/luna-dns" ><img src="https://codecov.io/gh/r7wx/luna-dns/branch/master/graph/badge.svg?token=2VJYV1R39F"/></a>
 <a href="https://www.codefactor.io/repository/github/r7wx/luna-dns"><img src="https://www.codefactor.io/repository/github/r7wx/luna-dns/badge?s=37c25430d7b6b31b86ad49810d6f89ef50629615" alt="CodeFactor" /></a>
 </p>
 
 ---
-
-<img src="assets/screenshot.jpg" />
 
 <p align="justify">
 Luna DNS is a simple and easy-to-configure DNS forwarder, configuring customs hosts is easy and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
