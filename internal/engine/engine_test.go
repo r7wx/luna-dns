@@ -1,23 +1,3 @@
-/*
-MIT License
-Copyright (c) 2022 r7wx
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 package engine
 
 import (
@@ -133,5 +113,42 @@ func TestFormatMessage(t *testing.T) {
 	out := formatMessage(&original)
 	if reflect.DeepEqual(originalHeader, out.MsgHdr) {
 		t.Fail()
+	}
+}
+
+func TestEngine_buildForwardChain(t *testing.T) {
+	dns := []config.DNS{
+		{Addr: "1.1.1.1:53", Network: "udp"},
+		{Addr: "2.2.2.2:53", Network: "udp"},
+		{Addr: "3.3.3.3:53", Network: "udp"},
+	}
+	engine := &Engine{dns: dns}
+
+	engine.forwardIndex = 1
+	expectedChain := []config.DNS{
+		{Addr: "2.2.2.2:53", Network: "udp"},
+		{Addr: "3.3.3.3:53", Network: "udp"},
+		{Addr: "1.1.1.1:53", Network: "udp"},
+	}
+	actualChain := engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 1 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
+	}
+
+	engine.forwardIndex = len(dns)
+	expectedChain = dns
+	actualChain = engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 2 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
+	}
+
+	engine.forwardIndex = len(dns) + 1
+	expectedChain = dns
+	actualChain = engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 3 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
 	}
 }
