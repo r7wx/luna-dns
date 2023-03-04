@@ -1,9 +1,9 @@
-FROM golang:1.19 AS go-builder
+FROM golang:1.20 AS go-builder
 WORKDIR /luna-dns
 COPY . .
 RUN make
 
-FROM alpine:3.16 AS luna-dns
+FROM alpine:3.17 AS luna-dns
 WORKDIR /etc/luna-dns
 COPY ./config.yml .
 WORKDIR /usr/bin

@@ -16,7 +16,7 @@
 ---
 
 <p align="justify">
-Luna DNS is a simple and easy-to-configure DNS forwarder, configuring customs hosts is easy and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
+Luna DNS is a straightforward DNS forwarder with cache and custom hosts based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
 </p>
 
 ## Deployment
