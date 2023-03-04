@@ -4,17 +4,16 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
+	"log"
 
 	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/config"
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
 func (e *Engine) forward(message *dns.Msg) {
 	cachedAnswer := e.cache.Search(message.Question)
 	if cachedAnswer != nil {
-		logger.Debug(fmt.Sprintf("Entry found in cache: %v",
-			cachedAnswer))
+		log.Printf("Entry found in cache: %v\n", cachedAnswer)
 		message.Answer = cachedAnswer
 		return
 	}
@@ -26,8 +25,8 @@ func (e *Engine) forward(message *dns.Msg) {
 			break
 		}
 
-		logger.Debug(fmt.Sprintf("%s (%s): %s",
-			server.Addr, server.Network, err))
+		log.Printf("%s (%s): %s\n", server.Addr,
+			server.Network, err)
 	}
 
 	e.forwardIndex = (e.forwardIndex + 1) % len(e.dns)
@@ -57,8 +56,8 @@ func (e *Engine) forwardRequest(server config.DNS, message *dns.Msg) error {
 
 	if len(response.Answer) > 0 {
 		message.Answer = response.Answer
-		logger.Debug(fmt.Sprintf("%s (%s) -> %s", server.Addr,
-			server.Network, response.Answer))
+		log.Printf("%s (%s) -> %s\n", server.Addr, server.Network,
+			response.Answer)
 		go e.cache.Insert(message.Question, response.Answer)
 	}
 

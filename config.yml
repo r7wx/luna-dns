@@ -1,7 +1,7 @@
 addr: "0.0.0.0:5355"
 network: "udp"
 cache_ttl: 14400
-debug: true
+log_file: ""
 dns:
   - addr: "8.8.8.8:53"
     network: "tcp"

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/miekg/dns"
 )
@@ -15,6 +16,7 @@ func (e *Engine) query(message *dns.Msg) {
 				e.forward(message)
 				return
 			}
+			log.Printf("%s: %s\n", q.Name[:len(q.Name)-1], ip)
 
 			rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
 			if err == nil {

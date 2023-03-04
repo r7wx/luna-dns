@@ -1,29 +1,43 @@
 package main
 
 import (
+	"io"
+	"log"
 	"os"
 
+	"github.com/natefinch/lumberjack"
 	"github.com/r7wx/luna-dns/internal/config"
 	"github.com/r7wx/luna-dns/internal/engine"
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
 func main() {
 	args := os.Args[1:]
 	if len(args) <= 0 {
-		logger.Fatal("no configuration file provided")
+		log.Fatal("No configuration file provided")
 	}
 	config, err := config.Load(args[0])
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
-	logger.Info("Configuration file loaded: " + args[0])
+	log.Println("Configuration file loaded: " + args[0])
+
+	if config.LogFile != "" {
+		logWriter := io.MultiWriter(os.Stdout,
+			&lumberjack.Logger{
+				Filename:   config.LogFile,
+				MaxSize:    250,
+				MaxBackups: 2,
+				MaxAge:     7,
+			},
+		)
+		log.SetOutput(logWriter)
+	}
 
 	engine, err := engine.NewEngine(config)
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 	if err := engine.Start(); err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
 }

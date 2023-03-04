@@ -1,13 +1,13 @@
 package engine
 
 import (
+	"log"
 	"time"
 
 	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/cache"
 	"github.com/r7wx/luna-dns/internal/config"
 	"github.com/r7wx/luna-dns/internal/entry"
-	"github.com/r7wx/luna-dns/internal/logger"
 	"github.com/r7wx/luna-dns/internal/tree"
 )
 
@@ -47,8 +47,8 @@ func NewEngine(config *config.Config) (*Engine, error) {
 func (e *Engine) Start() error {
 	go e.cache.Routine()
 
-	logger.Info("Engine listening on: " + e.addr + " (" +
-		e.network + ")")
+	log.Printf("Listening on %s (%s)\n", e.addr,
+		e.network)
 
 	dns.HandleFunc(".", e.handler)
 	server := &dns.Server{Addr: e.addr, Net: e.network}

@@ -1,22 +1,20 @@
 package cache
 
 import (
-	"fmt"
+	"log"
 	"time"
-
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
 // Routine - Starts the cache cleaning routine
 func (c *Cache) Routine() {
 	for {
 		time.Sleep(c.ttl + (1 * time.Second))
-		logger.Info("Cleaning old cache entries...")
+		log.Println("Cleaning old cache entries...")
 
 		deletedEntries := c.deleteOldEntries()
 		if deletedEntries > 0 {
-			logger.Info("Deleted " + fmt.Sprint(deletedEntries) +
-				" entries from cache")
+			log.Printf("Deleted %d entries from cache\n",
+				deletedEntries)
 		}
 	}
 }

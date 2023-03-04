@@ -3,7 +3,6 @@ package config
 import (
 	"io/ioutil"
 
-	"github.com/r7wx/luna-dns/internal/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -23,9 +22,9 @@ type DNS struct {
 type Config struct {
 	Addr     string `yaml:"addr"`
 	Network  string `yaml:"network"`
+	LogFile  string `yaml:"log_file"`
 	DNS      []DNS  `yaml:"dns"`
 	Hosts    []Host `yaml:"hosts"`
-	Debug    bool   `yaml:"debug"`
 	CacheTTL int64  `yaml:"cache_ttl"`
 }
 
@@ -38,10 +37,6 @@ func Load(filepath string) (*Config, error) {
 
 	config := &Config{}
 	err = yaml.Unmarshal(confBytes, config)
-
-	if config.Debug {
-		logger.DebugEnabled = true
-	}
 
 	return config, err
 }

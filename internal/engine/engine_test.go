@@ -78,7 +78,6 @@ func TestHandler(t *testing.T) {
 				IP:   "127.0.0.1",
 			},
 		},
-		Debug: true,
 	})
 
 	testW := testResponseWrtiter{}

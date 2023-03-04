@@ -1,11 +1,11 @@
 package cache
 
 import (
+	"log"
 	"sync"
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
 // Cache - DNS cache struct
@@ -44,6 +44,5 @@ func (c *Cache) Insert(question []dns.Question, answer []dns.RR) {
 		createdAt: time.Now(),
 		answer:    answer,
 	}
-	logger.Debug("New entry in cache: " +
-		hash)
+	log.Println("New entry in cache: " + hash)
 }
