@@ -65,7 +65,9 @@ Luna DNS is configured by an YAML configuration file. An example configuration i
 addr: "0.0.0.0:5355" # the address luna-dns will bind to
 network: "udp" # luna-dns server protocol (udp or tcp supported)
 cache_ttl: 14400 # after how long the cached data is cleared (expressed in seconds)
-log_file: "test.log" # if a valid file path is set the logs will be written to that file, leave empty to disable log file.
+
+# if a valid file path is set the logs will be written to that file, leave empty to disable log file
+log_file: "test.log"
 
 # remote dns servers to forward requests to (if not matching custom hosts)
 dns:
