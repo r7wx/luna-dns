@@ -20,8 +20,10 @@ func (c *Cache) Routine() {
 }
 
 func (c *Cache) deleteOldEntries() int {
-	deletedEntries := 0
+	c.Lock()
+	defer c.Unlock()
 
+	deletedEntries := 0
 	for hash, entry := range c.entries {
 		delta := time.Now().Sub(entry.createdAt)
 		if delta > c.ttl {

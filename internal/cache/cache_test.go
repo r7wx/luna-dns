@@ -42,7 +42,9 @@ func TestCacheRoutine(t *testing.T) {
 
 	time.Sleep(5 * time.Second)
 
+	cache.Lock()
 	if len(cache.entries) > 0 {
 		t.Fatal()
 	}
+	cache.Unlock()
 }
