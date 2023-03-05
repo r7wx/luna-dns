@@ -1,23 +1,3 @@
-/*
-MIT License
-Copyright (c) 2022 r7wx
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 package engine
 
 import (
@@ -25,6 +5,7 @@ import (
 	"net"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/config"
@@ -88,6 +69,34 @@ func TestNewEngine(t *testing.T) {
 	}
 }
 
+func TestEngineStart(t *testing.T) {
+	e, _ := NewEngine(&config.Config{
+		Addr:    "127.0.0.1:53555",
+		Network: "tcp",
+		Hosts: []config.Host{
+			{
+				Host: "google.com",
+				IP:   "127.0.0.1",
+			},
+		},
+	})
+
+	go func() {
+		err := e.Start()
+		if err != nil {
+			t.Errorf("Start returned an error: %v", err)
+		}
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+
+	conn, err := net.Dial(e.network, e.addr)
+	if err != nil {
+		t.Fatalf("Failed to dial DNS server: %v", err)
+	}
+	defer conn.Close()
+}
+
 func TestHandler(t *testing.T) {
 	engine, _ := NewEngine(&config.Config{
 		Addr:    "127.0.0.1:53555",
@@ -98,7 +107,6 @@ func TestHandler(t *testing.T) {
 				IP:   "127.0.0.1",
 			},
 		},
-		Debug: true,
 	})
 
 	testW := testResponseWrtiter{}
@@ -132,6 +140,75 @@ func TestFormatMessage(t *testing.T) {
 
 	out := formatMessage(&original)
 	if reflect.DeepEqual(originalHeader, out.MsgHdr) {
+		t.Fail()
+	}
+}
+
+func TestEngineBuildForwardChain(t *testing.T) {
+	dns := []config.DNS{
+		{Addr: "1.1.1.1:53", Network: "udp"},
+		{Addr: "2.2.2.2:53", Network: "udp"},
+		{Addr: "3.3.3.3:53", Network: "udp"},
+	}
+	engine := &Engine{dns: dns}
+
+	engine.forwardIndex = 1
+	expectedChain := []config.DNS{
+		{Addr: "2.2.2.2:53", Network: "udp"},
+		{Addr: "3.3.3.3:53", Network: "udp"},
+		{Addr: "1.1.1.1:53", Network: "udp"},
+	}
+	actualChain := engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 1 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
+	}
+
+	engine.forwardIndex = len(dns)
+	expectedChain = dns
+	actualChain = engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 2 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
+	}
+
+	engine.forwardIndex = len(dns) + 1
+	expectedChain = dns
+	actualChain = engine.buildForwardChain()
+	if !reflect.DeepEqual(actualChain, expectedChain) {
+		t.Errorf("Test case 3 failed. Expected %v, but got %v",
+			expectedChain, actualChain)
+	}
+}
+
+func TestEngineForward(t *testing.T) {
+	engine, _ := NewEngine(&config.Config{
+		Addr:    "127.0.0.1:53555",
+		Network: "udp",
+		DNS: []config.DNS{
+			{
+				Addr:    "8.8.8.8:53",
+				Network: "udp",
+			},
+			{
+				Addr:    "8.8.4.4:53",
+				Network: "udp",
+			},
+		},
+	})
+
+	msg := &dns.Msg{}
+	msg.SetQuestion("www.example.com.", dns.TypeA)
+	engine.cache.Insert([]dns.Question{msg.Question[0]}, []dns.RR{})
+	engine.forward(msg)
+	if len(msg.Answer) != 0 {
+		t.Fail()
+	}
+
+	msg = &dns.Msg{}
+	msg.SetQuestion("www.google.com.", dns.TypeA)
+	engine.forward(msg)
+	if len(msg.Answer) == 0 {
 		t.Fail()
 	}
 }

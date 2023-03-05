@@ -3,7 +3,7 @@
   <br />
   luna-dns
 </h1>
-<h4 align="center">Straightforward DNS forwarder with cache and custom hosts</h3>
+<h4 align="center">Straightforward DNS forwarder with cache and custom hosts support</h3>
 
 <p align="center">
 <img src="https://img.shields.io/github/v/release/r7wx/luna-dns" alt="Release" />
@@ -14,10 +14,6 @@
 </p>
 
 ---
-
-<p align="justify">
-Luna DNS is a simple and easy-to-configure DNS forwarder, configuring customs hosts is easy and supports wildcards. This project is based on the awesome Go DNS library <a href="https://github.com/miekg/dns">miekg/dns</a>.
-</p>
 
 ## Deployment
 
@@ -69,7 +65,10 @@ Luna DNS is configured by an YAML configuration file. An example configuration i
 addr: "0.0.0.0:5355" # the address luna-dns will bind to
 network: "udp" # luna-dns server protocol (udp or tcp supported)
 cache_ttl: 14400 # after how long the cached data is cleared (expressed in seconds)
-debug: true # if true luna-dns will log debug information
+
+# if a valid file path is set the logs will be written to that file
+# leave empty to disable log file
+log_file: "test.log"
 
 # remote dns servers to forward requests to (if not matching custom hosts)
 dns:

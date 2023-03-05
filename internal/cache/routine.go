@@ -1,49 +1,29 @@
-/*
-MIT License
-Copyright (c) 2022 r7wx
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
 package cache
 
 import (
-	"fmt"
+	"log"
 	"time"
-
-	"github.com/r7wx/luna-dns/internal/logger"
 )
 
 // Routine - Starts the cache cleaning routine
 func (c *Cache) Routine() {
 	for {
 		time.Sleep(c.ttl + (1 * time.Second))
-		logger.Info("Cleaning old cache entries...")
+		log.Println("Cleaning old cache entries...")
 
 		deletedEntries := c.deleteOldEntries()
 		if deletedEntries > 0 {
-			logger.Info("Deleted " + fmt.Sprint(deletedEntries) +
-				" entries from cache")
+			log.Printf("Deleted %d entries from cache\n",
+				deletedEntries)
 		}
 	}
 }
 
 func (c *Cache) deleteOldEntries() int {
-	deletedEntries := 0
+	c.Lock()
+	defer c.Unlock()
 
+	deletedEntries := 0
 	for hash, entry := range c.entries {
 		delta := time.Now().Sub(entry.createdAt)
 		if delta > c.ttl {
