@@ -5,6 +5,7 @@ import (
 	"net"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/r7wx/luna-dns/internal/config"
@@ -68,6 +69,34 @@ func TestNewEngine(t *testing.T) {
 	}
 }
 
+func TestEngineStart(t *testing.T) {
+	e, _ := NewEngine(&config.Config{
+		Addr:    "127.0.0.1:53555",
+		Network: "tcp",
+		Hosts: []config.Host{
+			{
+				Host: "google.com",
+				IP:   "127.0.0.1",
+			},
+		},
+	})
+
+	go func() {
+		err := e.Start()
+		if err != nil {
+			t.Errorf("Start returned an error: %v", err)
+		}
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+
+	conn, err := net.Dial(e.network, e.addr)
+	if err != nil {
+		t.Fatalf("Failed to dial DNS server: %v", err)
+	}
+	defer conn.Close()
+}
+
 func TestHandler(t *testing.T) {
 	engine, _ := NewEngine(&config.Config{
 		Addr:    "127.0.0.1:53555",
@@ -115,7 +144,7 @@ func TestFormatMessage(t *testing.T) {
 	}
 }
 
-func TestEngine_buildForwardChain(t *testing.T) {
+func TestEngineBuildForwardChain(t *testing.T) {
 	dns := []config.DNS{
 		{Addr: "1.1.1.1:53", Network: "udp"},
 		{Addr: "2.2.2.2:53", Network: "udp"},
@@ -149,5 +178,37 @@ func TestEngine_buildForwardChain(t *testing.T) {
 	if !reflect.DeepEqual(actualChain, expectedChain) {
 		t.Errorf("Test case 3 failed. Expected %v, but got %v",
 			expectedChain, actualChain)
+	}
+}
+
+func TestEngineForward(t *testing.T) {
+	engine, _ := NewEngine(&config.Config{
+		Addr:    "127.0.0.1:53555",
+		Network: "udp",
+		DNS: []config.DNS{
+			{
+				Addr:    "8.8.8.8:53",
+				Network: "udp",
+			},
+			{
+				Addr:    "8.8.4.4:53",
+				Network: "udp",
+			},
+		},
+	})
+
+	msg := &dns.Msg{}
+	msg.SetQuestion("www.example.com.", dns.TypeA)
+	engine.cache.Insert([]dns.Question{msg.Question[0]}, []dns.RR{})
+	engine.forward(msg)
+	if len(msg.Answer) != 0 {
+		t.Fail()
+	}
+
+	msg = &dns.Msg{}
+	msg.SetQuestion("www.google.com.", dns.TypeA)
+	engine.forward(msg)
+	if len(msg.Answer) == 0 {
+		t.Fail()
 	}
 }

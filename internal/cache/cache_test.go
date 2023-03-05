@@ -33,3 +33,16 @@ func TestCache(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+func TestCacheRoutine(t *testing.T) {
+	cache := NewCache(1 * time.Second)
+	go cache.Routine()
+
+	cache.Insert([]dns.Question{}, []dns.RR{})
+
+	time.Sleep(5 * time.Second)
+
+	if len(cache.entries) > 0 {
+		t.Fatal()
+	}
+}
