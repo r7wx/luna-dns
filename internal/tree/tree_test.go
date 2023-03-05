@@ -15,7 +15,6 @@ func TestBasics(t *testing.T) {
 			found, _ := tree.Search(testEntry.Host)
 			if found == "" {
 				t.Fatal()
-				continue
 			}
 
 			if found != testEntry.IP {
