@@ -1,13 +1,10 @@
 package blocklists
 
 import (
-	"bufio"
 	"log"
-	"net/http"
 	"strings"
 	"time"
 
-	"github.com/r7wx/luna-dns/internal/entry"
 	"github.com/r7wx/luna-dns/internal/tree"
 )
 
@@ -40,34 +37,13 @@ func (b *Blocklists) Routine() {
 
 		newHosts := tree.NewTree()
 		for _, blocklist := range b.blocklists {
-			log.Printf("Downloading %s...\n", blocklist)
-			resp, err := http.Get(blocklist)
-			if err != nil {
-				log.Printf("Error downloading blocklist %s: %s",
-					blocklist, err)
+			if strings.HasPrefix(blocklist, "file://") {
+				b.processFile(blocklist, newHosts)
 				continue
 			}
-			defer resp.Body.Close()
-
-			scanner := bufio.NewScanner(resp.Body)
-			for scanner.Scan() {
-				line := scanner.Text()
-				line = strings.TrimSpace(line)
-				entry, err := entry.NewEntry(line, "0.0.0.0")
-				if err != nil {
-					continue
-				}
-				newHosts.Insert(entry)
-			}
-
-			if err := scanner.Err(); err != nil {
-				log.Printf("Error processing blocklist %s: %s",
-					blocklist, err)
-				return
-			}
+			b.processRemote(blocklist, newHosts)
 		}
 		b.hosts = newHosts
-
 		log.Printf("Blocklists updated, next update in %s\n", updateTime)
 
 		time.Sleep(updateTime)
