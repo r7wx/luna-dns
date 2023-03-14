@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://github.com/r7wx/easy-gate"><img width="150" src="assets/logo.svg" /></a>
+  <a href="https://github.com/r7wx/luna-dns"><img width="150" src="assets/logo.svg" /></a>
   <br />
   luna-dns
 </h1>
