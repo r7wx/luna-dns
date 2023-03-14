@@ -20,12 +20,13 @@ type DNS struct {
 
 // Config - Main configuration struct
 type Config struct {
-	Addr     string `yaml:"addr"`
-	Network  string `yaml:"network"`
-	LogFile  string `yaml:"log_file"`
-	DNS      []DNS  `yaml:"dns"`
-	Hosts    []Host `yaml:"hosts"`
-	CacheTTL int64  `yaml:"cache_ttl"`
+	Addr       string   `yaml:"addr"`
+	Network    string   `yaml:"network"`
+	LogFile    string   `yaml:"log_file"`
+	DNS        []DNS    `yaml:"dns"`
+	Hosts      []Host   `yaml:"hosts"`
+	Blocklists []string `yaml:"blocklists"`
+	CacheTTL   int64    `yaml:"cache_ttl"`
 }
 
 // Load - Load configuration from file

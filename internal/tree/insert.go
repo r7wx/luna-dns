@@ -8,34 +8,38 @@ import (
 func (t *Tree) Insert(entry *entry.Entry) {
 	foundTLD, _ := searchNode(&t.tlds, entry.TLD)
 	if foundTLD == nil {
-		foundTLD = t.insertNode(&t.tlds, entry.TLD, entry.IP)
+		switch entry.TLD {
+		case "*":
+			foundTLD = t.insertNode(&t.tlds, entry.TLD, entry.IP)
+		default:
+			foundTLD = t.insertNode(&t.tlds, entry.TLD, "")
+		}
 	}
 
 	current := foundTLD
-	for _, subdomain := range entry.Subdomains {
+	for i, subdomain := range entry.Subdomains {
+		if subdomain != "*" && i != len(entry.Subdomains)-1 {
+			foundNode, _ := searchNode(&current.childrens, subdomain)
+			if foundNode == nil {
+				foundNode = t.insertNode(&current.childrens, subdomain, "")
+			}
+			current = foundNode
+			continue
+		}
+
 		foundNode, _ := searchNode(&current.childrens, subdomain)
 		if foundNode == nil {
-			foundNode = t.insertNode(&current.childrens, subdomain,
-				entry.IP)
+			foundNode = t.insertNode(&current.childrens, subdomain, entry.IP)
 		}
 		current = foundNode
+
+		if subdomain == "*" {
+			break
+		}
 	}
 }
 
 func (t *Tree) insertNode(nodes *map[string]*node, host string, ip string) *node {
-	if host == "*" {
-		for k := range *nodes {
-			delete(*nodes, k)
-		}
-		(*nodes)["*"] = &node{
-			ip:        ip,
-			childrens: map[string]*node{},
-		}
-
-		insertedNode, _ := searchNode(nodes, host)
-		return insertedNode
-	}
-
 	(*nodes)[host] = &node{
 		ip:        ip,
 		childrens: map[string]*node{},

@@ -2,6 +2,7 @@ package entry
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -15,12 +16,13 @@ type Entry struct {
 
 // NewEntry - Create a new entry
 func NewEntry(host, ip string) (*Entry, error) {
-	elements := strings.Split(host, ".")
-	if len(elements) == 1 && elements[0] != "*" {
-		return nil,
-			fmt.Errorf("invalid host: %s", host)
+	domainRegex := regexp.MustCompile(`^(?:(?:(?:[\w_-]+|\*)\.)+[\w_-]+)|\*$`)
+	if !domainRegex.MatchString(host) {
+		return nil, fmt.Errorf("invalid host format: %s",
+			host)
 	}
 
+	elements := strings.Split(host, ".")
 	subdomains := []string{}
 	for i := len(elements) - 2; i >= 0; i-- {
 		subdomains = append(subdomains, elements[i])
