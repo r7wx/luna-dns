@@ -57,7 +57,7 @@ The luna-dns image will always look for a configuration file in /etc/luna-dns/co
 ## Configuration
 
 <p align="justify">
-Luna DNS is configured by an YAML configuration file. An example configuration is provided in the root directory of this repository (config.yml).
+Luna DNS is configured via a YAML configuration file. A sample configuration is provided in the root of this repository (config.yml).
 </p>
 
 ```yml
