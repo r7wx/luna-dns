@@ -3,7 +3,7 @@
   <br />
   luna-dns
 </h1>
-<h4 align="center">Straightforward DNS forwarder with cache and custom hosts support</h3>
+<h4 align="center">Straightforward DNS forwarder with cache, custom hosts and blocklists support</h3>
 
 <p align="center">
 <img src="https://img.shields.io/github/v/release/r7wx/luna-dns" alt="Release" />
@@ -84,4 +84,11 @@ hosts:
     ip: 127.0.0.1
   - host: "*.test.com" # wildcard pattern example
     ip: 127.0.0.1
+
+# luna-dns supports blocklists both from local files or remote URI
+# each blocklist will be updated every 12 hours
+blocklists:
+  - http://test.test/test.txt
+  - file://folder/test.txt
+  - file:///root/test.txt
 ```
