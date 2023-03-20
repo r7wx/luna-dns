@@ -86,7 +86,13 @@ hosts:
     ip: 127.0.0.1
 
 # luna-dns supports blocklists both from local files or remote URI
-# each blocklist will be updated every 12 hours
+# each blocklist will be updated every 12 hours.
+# blocklists must contain only one domain name per line.
+# Every blocked record resolves to 0.0.0.0
+# ex.
+# google.com
+# test.com
+# ...
 blocklists:
   - http://test.test/test.txt
   - file://folder/test.txt
