@@ -11,6 +11,20 @@ import (
 )
 
 func (e *Engine) forward(message *dns.Msg) {
+	for _, q := range message.Question {
+		ip, err := e.Blocklists.Search(q.Name[:len(q.Name)-1])
+		if ip == "" || err != nil {
+			continue
+		}
+		log.Printf("Blocked: %s: %s\n", q.Name[:len(q.Name)-1], ip)
+
+		rr, err := dns.NewRR(fmt.Sprintf("%s A %s", q.Name, ip))
+		if err == nil {
+			message.Answer = append(message.Answer, rr)
+			return
+		}
+	}
+
 	cachedAnswer := e.cache.Search(message.Question)
 	if cachedAnswer != nil {
 		log.Printf("Entry found in cache: %v\n", cachedAnswer)

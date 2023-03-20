@@ -14,4 +14,9 @@ func TestEntry(t *testing.T) {
 	if err == nil {
 		t.Fatal()
 	}
+
+	_, err = NewEntry(".", "127.0.0.1")
+	if err == nil {
+		t.Fatal()
+	}
 }

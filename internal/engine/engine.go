@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
+	"github.com/r7wx/luna-dns/internal/blocklists"
 	"github.com/r7wx/luna-dns/internal/cache"
 	"github.com/r7wx/luna-dns/internal/config"
 	"github.com/r7wx/luna-dns/internal/entry"
@@ -14,6 +15,7 @@ import (
 // Engine - DNS Engine
 type Engine struct {
 	Hosts        *tree.Tree
+	Blocklists   *blocklists.Blocklists
 	cache        *cache.Cache
 	addr         string
 	network      string
@@ -33,7 +35,8 @@ func NewEngine(config *config.Config) (*Engine, error) {
 	}
 
 	return &Engine{
-		Hosts: Hosts,
+		Hosts:      Hosts,
+		Blocklists: blocklists.NewBlocklists(config.Blocklists),
 		cache: cache.NewCache(time.Duration(config.CacheTTL) *
 			time.Second),
 		addr:         config.Addr,
@@ -45,6 +48,7 @@ func NewEngine(config *config.Config) (*Engine, error) {
 
 // Start - Start Engine DNS server
 func (e *Engine) Start() error {
+	go e.Blocklists.Routine()
 	go e.cache.Routine()
 
 	log.Printf("Listening on %s (%s)\n", e.addr,

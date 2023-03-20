@@ -32,7 +32,9 @@ hosts:
   - host: google.com
     ip: 127.0.0.1
   - host: "*.test.com"
-    ip: 127.0.0.1`))
+    ip: 127.0.0.1
+blocklists:
+  - http://127.0.0.1/test.txt`))
 	defer os.Remove(filePath)
 
 	config, err := Load(filePath)
@@ -63,6 +65,11 @@ hosts:
 			Host: "*.test.com",
 			IP:   "127.0.0.1",
 		},
+	}) {
+		t.Fatal()
+	}
+	if !reflect.DeepEqual(config.Blocklists, []string{
+		"http://127.0.0.1/test.txt",
 	}) {
 		t.Fatal()
 	}

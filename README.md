@@ -3,13 +3,12 @@
   <br />
   luna-dns
 </h1>
-<h4 align="center">Straightforward DNS forwarder with cache and custom hosts support</h3>
+<h4 align="center">Straightforward DNS forwarder with cache, custom hosts and blocklists support</h3>
 
 <p align="center">
 <img src="https://img.shields.io/github/v/release/r7wx/luna-dns" alt="Release" />
 <a href="https://github.com/r7wx/luna-dns/actions/workflows/build.yml" /><img src="https://github.com/r7wx/luna-dns/actions/workflows/build.yml/badge.svg" alt="Build"></a>
 <a href="https://github.com/r7wx/luna-dns/actions/workflows/test.yml" /><img src="https://github.com/r7wx/luna-dns/actions/workflows/test.yml/badge.svg" alt="Test"></a>
-<a href="https://codecov.io/gh/r7wx/luna-dns" ><img src="https://codecov.io/gh/r7wx/luna-dns/branch/master/graph/badge.svg?token=2VJYV1R39F"/></a>
 <a href="https://www.codefactor.io/repository/github/r7wx/luna-dns"><img src="https://www.codefactor.io/repository/github/r7wx/luna-dns/badge?s=37c25430d7b6b31b86ad49810d6f89ef50629615" alt="CodeFactor" /></a>
 </p>
 
@@ -58,7 +57,7 @@ The luna-dns image will always look for a configuration file in /etc/luna-dns/co
 ## Configuration
 
 <p align="justify">
-Luna DNS is configured by an YAML configuration file. An example configuration is provided in the root directory of this repository (config.yml).
+Luna DNS is configured via a YAML configuration file. A sample configuration is provided in the root of this repository (config.yml).
 </p>
 
 ```yml
@@ -85,4 +84,17 @@ hosts:
     ip: 127.0.0.1
   - host: "*.test.com" # wildcard pattern example
     ip: 127.0.0.1
+
+# luna-dns supports blocklists both from local files or remote URI
+# each blocklist will be updated every 12 hours.
+# Blocklists must contain only one domain name per line.
+# Every blocked record resolves to 0.0.0.0
+# ex.
+# google.com
+# test.com
+# ...
+blocklists:
+  - http://test.test/test.txt
+  - file://folder/test.txt
+  - file:///root/test.txt
 ```
