@@ -87,7 +87,7 @@ hosts:
 
 # luna-dns supports blocklists both from local files or remote URI
 # each blocklist will be updated every 12 hours.
-# blocklists must contain only one domain name per line.
+# Blocklists must contain only one domain name per line.
 # Every blocked record resolves to 0.0.0.0
 # ex.
 # google.com
