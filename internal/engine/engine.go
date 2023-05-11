@@ -35,8 +35,9 @@ func NewEngine(config *config.Config) (*Engine, error) {
 	}
 
 	return &Engine{
-		Hosts:      Hosts,
-		Blocklists: blocklists.NewBlocklists(config.Blocklists),
+		Hosts: Hosts,
+		Blocklists: blocklists.NewBlocklists(config.Blocklists,
+			config.BlocklistUpdate),
 		cache: cache.NewCache(time.Duration(config.CacheTTL) *
 			time.Second),
 		addr:         config.Addr,
@@ -51,8 +52,7 @@ func (e *Engine) Start() error {
 	go e.Blocklists.Routine()
 	go e.cache.Routine()
 
-	log.Printf("Listening on %s (%s)\n", e.addr,
-		e.network)
+	log.Printf("Listening on %s (%s)\n", e.addr, e.network)
 
 	dns.HandleFunc(".", e.handler)
 	server := &dns.Server{Addr: e.addr, Net: e.network}
