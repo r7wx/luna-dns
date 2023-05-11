@@ -12,7 +12,7 @@ import (
 
 func TestNewBlocklists(t *testing.T) {
 	blocklists := []string{"blocklist1", "blocklist2"}
-	b := NewBlocklists(blocklists)
+	b := NewBlocklists(blocklists, 1)
 	if b.hosts == nil {
 		t.Errorf("Expected hosts to be initialized")
 	}
