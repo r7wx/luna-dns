@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/r7wx/meka-cfg">
+  <a href="https://github.com/r7wx/luna-dns">
      <picture>
     <img width="150" src="assets/logo.svg"/>
     </picture>
